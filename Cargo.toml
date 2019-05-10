@@ -1,0 +1,9 @@
+[package]
+name = "emtm_db"
+version = "0.1.0"
+authors = ["Miguel Chan <vvchan@outlook.com>"]
+edition = "2018"
+
+[dependencies]
+diesel = { version = "1.4.0", features = ["mysql"] }
+
