@@ -3,7 +3,7 @@
 ## Setting up database with Docker
 
 ```
-docker run --name emtm-mysql -e MYSQL_ROOT_PASSWORD=ROOT_PASSWORD -e MYSQL_USER=emtm -e MYSQL_PASSWORD=EMTM_PASSWORD  -d mysql:5.7
+docker run --name emtm-mysql -e MYSQL_ROOT_PASSWORD=ROOT_PASSWORD -e MYSQL_USER=emtm -e MYSQL_PASSWORD=EMTM_PASSWORD -p 9877:3306  -d mysql:5.7
 ```
 
 Use phpMyAdmin to manage database:
