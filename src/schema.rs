@@ -1,14 +1,19 @@
 table! {
     emtm_cows (uid) {
         uid -> Integer,
-        company -> Nullable<Varchar>,
+        company -> Varchar,
     }
 }
 
 table! {
     emtm_students (uid) {
         uid -> Integer,
-        school -> Nullable<Varchar>,
+        school -> Varchar,
+        credit -> Integer,
+        accepted -> Integer,
+        finished -> Integer,
+        major -> Varchar,
+        year -> Integer,
     }
 }
 
