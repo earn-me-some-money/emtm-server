@@ -8,7 +8,7 @@ table! {
 table! {
     emtm_students (uid) {
         uid -> Integer,
-        school -> Varchar,
+        school_id -> Integer,
         credit -> Integer,
         accepted -> Integer,
         finished -> Integer,
@@ -22,10 +22,19 @@ table! {
         uid -> Integer,
         wechat_id -> Varchar,
         phone -> Varchar,
+        email -> Varchar,
         personal_info -> Text,
         username -> Varchar,
         verified -> Bool,
         tokens -> Integer,
+        user_type -> Tinyint,
+    }
+}
+
+table! {
+    school_zh (school_id) {
+        school_id -> Integer,
+        school_name -> Varchar,
     }
 }
 
@@ -36,4 +45,5 @@ allow_tables_to_appear_in_same_query!(
     emtm_cows,
     emtm_students,
     emtm_users,
+    school_zh,
 );

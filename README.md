@@ -11,6 +11,13 @@ Use phpMyAdmin to manage database:
 docker run --name emtm-myadmin --rm -d --link emtm-mysql:db -p 8080:80 phpmyadmin/phpmyadmin
 ```
 
+## Examples
+
+Some examples are included in `src/bin`. Use the following command to test them:
+```
+cargo run --bin show
+cargo run --bin add_cows
+```
 
 ## Contributing Guideline
 
