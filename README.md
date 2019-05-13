@@ -34,10 +34,10 @@ diesel migration run
 
 ## Examples
 
-Some examples are included in `src/bin`. Use the following command to test them:
+Some examples are included in `examples`. Use the following command to test them:
 ```
-cargo run --bin show
-cargo run --bin add_cows
+cargo run --example show
+cargo run --example add_cows
 ```
 
 ## Contributing Guideline
