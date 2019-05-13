@@ -9,6 +9,17 @@ pub fn establish() -> MysqlConnection {
 
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URL must be set");
-    MysqlConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url))
+    let conn = MysqlConnection::establish(&database_url)
+        .expect(&format!("Error connecting to {}", database_url));
+
+    let migration_result = diesel_migrations::run_pending_migrations(&conn);
+
+    match migration_result {
+        Ok(_) => {},
+        Err(error) => {
+            error!("Error when running migrations: {}", error);
+            panic!(error);
+        },
+    }
+    conn
 }
