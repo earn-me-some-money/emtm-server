@@ -1,4 +1,5 @@
 # emtm-db
+[![Build Status](https://travis-ci.com/earn-me-some-money/emtm-db.svg?branch=master)](https://travis-ci.com/earn-me-some-money/emtm-db)
 
 ## Setting up database with Docker
 

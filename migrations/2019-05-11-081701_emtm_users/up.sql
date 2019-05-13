@@ -11,6 +11,8 @@ CREATE TABLE emtm_users
     # 0 for cow, 1 for student
     user_type     TINYINT     NOT NULL CHECK ( user_type in (0, 1) ),
     UNIQUE (username),
+    UNIQUE (email),
+    UNIQUE (wechat_id),
     INDEX username_ind (username),
     INDEX wechat_ind (wechat_id)
 ) CHARACTER SET utf8mb4;

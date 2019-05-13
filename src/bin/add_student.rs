@@ -16,7 +16,7 @@ fn main() {
     let students = vec![
         Student {
             uid: 0,
-            wechat_id: "ello".to_string(),
+            wechat_id: "ellaso".to_string(),
             phone: "123".to_string(),
             personal_info: "12341234".to_string(),
             email: "aa@f.f".to_string(),
@@ -32,11 +32,11 @@ fn main() {
         },
         Student {
             uid: 1,
-            wechat_id: "adsgasd".to_string(),
+            wechat_id: "adsg11asd".to_string(),
             phone: "1242314".to_string(),
             personal_info: "lkafsd".to_string(),
             email: "bb@#lkasdfgj".to_string(),
-            username: "ads1f123".to_string(),
+            username: "ads1f1柠檬🍋23".to_string(),
             verified: false,
             tokens: 0,
             school_id: ctrl.get_school_id("华南理工大学").unwrap(),
