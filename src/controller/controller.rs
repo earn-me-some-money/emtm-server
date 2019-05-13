@@ -2,7 +2,7 @@ use diesel::mysql::MysqlConnection;
 
 use crate::controller::connection;
 
-
+/// The database controller for CRUD in emtm's database.
 pub struct Controller {
     pub connection: MysqlConnection
 }

@@ -3,11 +3,9 @@ use crate::db_models;
 use crate::models;
 use diesel::prelude::*;
 
-
 pub trait UserController {
 
     //Add Users
-
     /// Add cows with a vector of Cows, returns the uid of added cows
     /// # Arguments
     /// * 'cows' - A vector containing all the cow instances to be added
@@ -26,14 +24,22 @@ pub trait UserController {
 
 
     //Query Users
-    /// Query a user from a given uid
+    /// Query a user from a given uid, returns None if user doesn't exist
     /// # Arguments
     /// * 'to_search' - The uid to be search
-    fn get_user_from_uid(&self, to_search: i32) -> Option<db_models::users::User>;
+    fn get_user_from_uid(&self, to_search: i32) -> Option<models::users::User>;
     /// Query a user from a given username
     /// # Arguments
     /// * 'name' - The username to be search
-    fn get_user_from_username(&self, name: &str) -> Option<db_models::users::User>;
+    fn get_user_from_username(&self, name: &str) -> Option<models::users::User>;
+    /// Helper function, returns a user enum from a given db user
+    /// # Arguments
+    /// * 'u' - The user to find a user
+    fn get_user_from_db_user(&self, u: db_models::users::User) -> Option<models::users::User>;
+    /// Query a db user from a given username
+    /// # Arguments
+    /// * 'name' - The username to be search
+    fn get_db_user_from_username(&self, name: &str) -> Option<db_models::users::User>;
     /// Query a cow from a given uid
     /// # Arguments
     /// * 'to_search' - The uid to be search
@@ -49,6 +55,7 @@ impl UserController for Controller {
     fn add_cows(&self, cows: Vec<models::users::Cow>) -> Vec<Result<(i32), String>> {
         let mut u_results = vec![];
 
+        // insert into user table
         for cow in &cows {
             info!("Adding cow with username {}", cow.username);
             let db_u = db_models::users::NewUser {
@@ -64,6 +71,7 @@ impl UserController for Controller {
             u_results.push(self.add_db_user(db_u))
         }
 
+        // insert into cow table
         let mut results = vec![];
         for (cow, u_res) in cows.iter().zip(u_results.iter()) {
             if let Ok(user) = u_res {
@@ -90,7 +98,7 @@ impl UserController for Controller {
                         }
                     }
                     Err(error) => {
-                        info!("Failed to add cow with uid {} because: {}", user.uid, error);
+                        info!("Failed to add cow with uid {}: {}", user.uid, error);
                         Err(error.to_string())
                     }
                 });
@@ -151,7 +159,7 @@ impl UserController for Controller {
                         }
                     }
                     Err(error) => {
-                        info!("Failed to add student with uid {} because: {}", user.uid, error);
+                        info!("Failed to add student with uid {}: {}", user.uid, error);
                         Err(error.to_string())
                     }
                 });
@@ -172,7 +180,7 @@ impl UserController for Controller {
 
         match result {
             Ok(_) => {
-                let user = self.get_user_from_username(&new_user.username);
+                let user = self.get_db_user_from_username(&new_user.username);
                 match user {
                     Some(u) => {
                         info!("Successfully added user with uid {}", u.uid);
@@ -185,14 +193,22 @@ impl UserController for Controller {
                 }
             }
             Err(error) => {
-                info!("Failed to add user with username {} because: {}", new_user.username, error);
+                info!("Failed to add user with username {}: {}", new_user.username, error);
                 Err(error.to_string())
             }
         }
     }
 
 
-    fn get_user_from_uid(&self, to_search: i32) -> Option<db_models::users::User> {
+
+
+
+
+
+
+
+
+    fn get_user_from_uid(&self, to_search: i32) -> Option<models::users::User> {
         use db_models::users::*;
         use crate::schema::emtm_users::dsl::*;
 
@@ -200,24 +216,28 @@ impl UserController for Controller {
             .filter(uid.eq(to_search))
             .load::<User>(&self.connection);
 
-        match results {
-            Ok(mut users) => {
-                if users.is_empty() {
-                    None
-                } else {
-                    //Get first element
-                    Some(users.swap_remove(0))
+        let db_u = {
+            match results {
+                Ok(mut users) => {
+                    if users.is_empty() {
+                        return None;
+                    } else {
+                        //Get first element
+                        users.swap_remove(0)
+                    }
+                }
+                Err(error) => {
+                    error!("Panic when querying user with uid {}: {}", to_search, error);
+                    panic!(error.to_string());
                 }
             }
-            Err(error) => {
-                error!("Panic when querying user with uid {} because: {}", to_search, error);
-                panic!(error.to_string());
-            }
-        }
+        };
+
+        self.get_user_from_db_user(db_u)
     }
 
 
-    fn get_user_from_username(&self, name: &str) -> Option<db_models::users::User> {
+    fn get_user_from_username(&self, name: &str) -> Option<models::users::User> {
         use db_models::users::*;
         use crate::schema::emtm_users::dsl::*;
 
@@ -225,20 +245,83 @@ impl UserController for Controller {
             .filter(username.eq(name))
             .load::<User>(&self.connection);
 
-        match results {
-            Ok(mut users) => {
-                if users.is_empty() {
-                    None
-                } else {
-                    //Get first element
-                    Some(users.swap_remove(0))
+        let db_u = {
+            match results {
+                Ok(mut users) => {
+                    if users.is_empty() {
+                        return None;
+                    } else {
+                        //Get first element
+                        users.swap_remove(0)
+                    }
+                }
+                Err(error) => {
+                    error!("Panic when querying user with username {}: {}", name, error);
+                    panic!(error.to_string());
                 }
             }
-            Err(error) => {
-                error!("Panic when querying user with username {} because: {}", name, error);
-                panic!(error.to_string());
+        };
+
+        self.get_user_from_db_user(db_u)
+    }
+
+    fn get_user_from_db_user(&self, db_u: db_models::users::User) -> Option<models::users::User> {
+        use models::users::User;
+
+        match db_u.user_type {
+            db_models::users::TYPE_COW => {
+                let db_c = self.get_cow_from_uid(db_u.uid);
+                match db_c {
+                    Some(c) => {
+                        Some(User::Cow(models::users::Cow::from_db(db_u, c)))
+                    }
+                    None => {
+                        warn!("Cow user with uid {} can't be found in cow table", db_u.uid);
+                        None
+                    }
+                }
+            }
+            db_models::users::TYPE_STUDENT => {
+                let db_s = self.get_student_from_uid(db_u.uid);
+                match db_s {
+                    Some(s) => {
+                        Some(User::Student(models::users::Student::from_db(db_u, s)))
+                    }
+                    None => {
+                        warn!("Cow user with uid {} can't be found in cow table", db_u.uid);
+                        None
+                    }
+                }
+            }
+            _ => {
+                warn!("Unexpected user type {} when querying uid {}", db_u.user_type, db_u.uid);
+                None
             }
         }
+    }
+
+    fn get_db_user_from_username(&self, name: &str) -> Option<db_models::users::User> {
+        use db_models::users::*;
+        use crate::schema::emtm_users::dsl::*;
+
+        let results = emtm_users
+            .filter(username.eq(name))
+            .load::<User>(&self.connection);
+            match results {
+                Ok(mut users) => {
+                    if users.is_empty() {
+                        None
+                    } else {
+                        //Get first element
+                        Some(users.swap_remove(0))
+                    }
+                }
+                Err(error) => {
+                    error!("Panic when querying user with username {}: {}", name, error);
+                    panic!(error.to_string());
+                }
+            }
+
     }
 
 
@@ -260,7 +343,7 @@ impl UserController for Controller {
                 }
             }
             Err(error) => {
-                error!("Panic when querying cow with uid {} because: {}", to_search, error);
+                error!("Panic when querying cow with uid {}: {}", to_search, error);
                 panic!(error.to_string());
             }
         }
@@ -285,7 +368,7 @@ impl UserController for Controller {
                 }
             }
             Err(error) => {
-                error!("Panic when querying student with uid {} because: {}", to_search, error);
+                error!("Panic when querying student with uid {}: {}", to_search, error);
                 panic!(error.to_string());
             }
         }

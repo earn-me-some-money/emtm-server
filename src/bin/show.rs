@@ -1,16 +1,16 @@
 extern crate emtm_db;
-extern crate env_logger;
+extern crate pretty_env_logger;
 
 use emtm_db::controller::Controller;
 use emtm_db::controller::user_controller::UserController;
 use emtm_db::controller::school_controller_zh::SchoolControllerZh;
 
 fn main() {
-    env_logger::init();
+    pretty_env_logger::init_timed();
 
     let ctrl = Controller::new();
     println!("{:?}", ctrl.get_user_from_uid(1));
-    println!("{:?}", ctrl.get_user_from_uid(2));
+    println!("{:?}", ctrl.get_user_from_uid(7));
     match ctrl.get_student_from_uid(2) {
         Some(u) => {
             println!("{:?}", ctrl.get_school_name(u.school_id));

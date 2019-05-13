@@ -1,5 +1,8 @@
 use crate::schema::*;
 
+pub const TYPE_COW: i8 = 0;
+pub const TYPE_STUDENT: i8 = 1;
+
 #[derive(Queryable,Debug,Clone)]
 pub struct User {
     pub uid: i32,

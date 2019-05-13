@@ -1,5 +1,5 @@
 extern crate emtm_db;
-extern crate env_logger;
+extern crate pretty_env_logger;
 
 use emtm_db::controller::controller::Controller;
 use emtm_db::controller::user_controller::UserController;
@@ -8,7 +8,7 @@ use emtm_db::controller::school_controller_zh::SchoolControllerZh;
 use emtm_db::models::users::*;
 
 fn main() {
-    env_logger::init();
+    pretty_env_logger::init_timed();
 
     let ctrl = Controller::new();
 

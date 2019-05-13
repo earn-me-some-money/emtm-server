@@ -8,10 +8,17 @@ pub struct School {
 }
 
 pub trait SchoolControllerZh {
+    /// Get the name of a school from id, returns None if school not found
+    /// # Arguments
+    /// * 'id' - the school id to be queried
     fn get_school_name(&self, id: i32) -> Option<String>;
 
+    /// Get the id of a school from name, returns None if school not found
+    /// # Arguments
+    /// * 'name' - the school name to be queried
     fn get_school_id(&self, name: &str) -> Option<i32>;
 
+    /// Get the list of all school, returns a vector of school instance
     fn get_school_list(&self) -> Vec<School>;
 }
 

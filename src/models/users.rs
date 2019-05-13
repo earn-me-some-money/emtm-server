@@ -20,6 +20,7 @@ pub struct Student {
 
 
 impl Student {
+    /// Create a User from a database user and database student
     pub fn from_db(u: db_models::users::User, s: db_models::users::Student) -> Self {
         Self {
             uid: u.uid,
@@ -38,6 +39,8 @@ impl Student {
             year: s.year,
         }
     }
+
+    /// Get the user and student for database storage
     pub fn to_db(&self) -> (db_models::users::User, db_models::users::Student) {
         (db_models::users::User {
             uid: self.uid,
@@ -105,3 +108,10 @@ impl Cow {
         })
     }
 }
+
+#[derive(Debug)]
+pub enum User {
+    Student(Student),
+    Cow(Cow)
+}
+
