@@ -11,6 +11,26 @@ Use phpMyAdmin to manage database:
 docker run --name emtm-myadmin --rm -d --link emtm-mysql:db -p 8080:80 phpmyadmin/phpmyadmin
 ```
 
+## Database Setup
+
+Install diesel CLI:
+```
+cargo install diesel_cli --no-default-features --features mysql
+```
+
+Edit `.env` file to configure your database server and user info. Example:
+```
+DATABASE_URL=mysql://root:ROOT_PASSWORD@127.0.0.1:9877/EMTM
+```
+
+Use Diesel migration to initialize your database:
+
+```
+diesel setup
+diesel migration run
+```
+
+
 ## Examples
 
 Some examples are included in `src/bin`. Use the following command to test them:
