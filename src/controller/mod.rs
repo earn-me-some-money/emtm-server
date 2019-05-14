@@ -2,6 +2,9 @@ mod connection;
 pub mod school_controller_zh;
 pub mod user_controller;
 
+pub use self::user_controller::UserController;
+pub use self::school_controller_zh::SchoolControllerZh;
+
 use diesel::mysql::MysqlConnection;
 use dotenv::dotenv;
 use std::env;
