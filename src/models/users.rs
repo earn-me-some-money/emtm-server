@@ -11,6 +11,7 @@ pub struct Student {
     pub verified: bool,
     pub tokens: i32,
     pub school_id: i32,
+    pub student_id: String,
     pub credit: i32,
     pub accepted: i32,
     pub finished: i32,
@@ -31,6 +32,7 @@ impl Student {
             verified: u.verified,
             tokens: u.tokens,
             school_id: s.school_id,
+            student_id: s.student_id,
             credit: s.credit,
             accepted: s.accepted,
             finished: s.finished,
@@ -56,6 +58,7 @@ impl Student {
             db_models::users::Student {
                 uid: self.uid,
                 school_id: self.school_id,
+                student_id: self.student_id.clone(),
                 credit: self.credit,
                 accepted: self.accepted,
                 finished: self.finished,
@@ -118,4 +121,14 @@ impl Cow {
 pub enum User {
     Student(Student),
     Cow(Cow),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum UserId<'a> {
+    Uid(i32),
+    WechatId(&'a str),
+    Phone(&'a str),
+    Email(&'a str),
+    // (school_id, student_id)
+    SchoolInfo(i32, &'a str),
 }

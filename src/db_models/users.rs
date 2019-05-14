@@ -37,6 +37,7 @@ pub struct NewUser<'a> {
 pub struct Student {
     pub uid: i32,
     pub school_id: i32,
+    pub student_id: String,
     pub credit: i32,
     pub accepted: i32,
     pub finished: i32,
@@ -49,6 +50,7 @@ pub struct Student {
 pub struct NewStudent<'a> {
     pub uid: i32,
     pub school_id: i32,
+    pub student_id: &'a str,
     pub credit: i32,
     pub accepted: i32,
     pub finished: i32,

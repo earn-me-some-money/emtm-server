@@ -37,22 +37,17 @@ pub trait UserController {
     fn update_db_student(&self, db_student: db_models::users::Student) -> Result<(), DbError>;
 
     //Query Users
-    /// Query a user from a given uid, returns None if user doesn't exist
+    /// Query a user from a given user identifier, returns None if user doesn't exist
     /// # Arguments
-    /// * 'to_search' - The uid to be searched
-    fn get_user_from_uid(&self, to_search: i32) -> Option<models::users::User>;
-    /// Query a user from a given username
-    /// # Arguments
-    /// * 'name' - The username to be searched
-    fn get_user_from_username(&self, name: &str) -> Option<models::users::User>;
+    /// * 'to_search' - The unique user identifier to be searched
+    fn get_user_from_identifier(
+        &self,
+        to_search: models::users::UserId,
+    ) -> Option<models::users::User>;
     /// Helper function, returns a user enum from a given db user
     /// # Arguments
     /// * 'u' - The user to find a user
     fn get_user_from_db_user(&self, u: db_models::users::User) -> Option<models::users::User>;
-    /// Query a db user from a given username
-    /// # Arguments
-    /// * 'name' - The username to be searched
-    fn get_db_user_from_username(&self, name: &str) -> Option<db_models::users::User>;
     /// Query a cow from a given uid
     /// # Arguments
     /// * 'to_search' - The uid to be searched
@@ -65,6 +60,11 @@ pub trait UserController {
     /// # Arguments
     /// * 'to_search' - The uid to be searched
     fn get_user_type_from_uid(&self, to_search: i32) -> Option<i8>;
+    /// Get a student instance from school id and student id
+    /// # Arguments
+    /// * 'school_id' - The school id of the student's university
+    /// * 'student_id' - The student id of the student.
+    fn get_student_uid_from_school_info(&self, school_id: i32, student_id: &str) -> Option<i32>;
 }
 
 impl UserController for Controller {
@@ -153,6 +153,7 @@ impl UserController for Controller {
                 let new_student = db_models::users::NewStudent {
                     uid: user.uid,
                     school_id: student.school_id,
+                    student_id: &student.student_id,
                     credit: student.credit,
                     accepted: student.accepted,
                     finished: student.finished,
@@ -204,19 +205,22 @@ impl UserController for Controller {
 
         match result {
             Ok(_) => {
-                let user = self.get_db_user_from_username(&new_user.username);
-                match user {
-                    Some(u) => {
-                        info!("Successfully added user with uid {}", u.uid);
-                        Ok(u)
-                    }
-                    None => {
-                        warn!(
-                            "Failed to add user with username {}, unknown error",
-                            new_user.username
-                        );
-                        Err(DbError::new("unknown error"))
-                    }
+                let mut user = {
+                    use crate::schema::emtm_users::dsl::*;
+                    emtm_users
+                        .filter(wechat_id.eq(&new_user.wechat_id))
+                        .load::<db_models::users::User>(&self.connection)
+                        .expect("database error")
+                };
+                if !user.is_empty() {
+                    info!("Successfully added user with uid {}", user[0].uid);
+                    Ok(user.remove(0))
+                } else {
+                    warn!(
+                        "Failed to add user with wechat id {}, unknown error",
+                        new_user.wechat_id
+                    );
+                    Err(DbError::new("unknown error"))
                 }
             }
             Err(error) => {
@@ -347,44 +351,43 @@ impl UserController for Controller {
         }
     }
 
-    fn get_user_from_uid(&self, to_search: i32) -> Option<models::users::User> {
+    fn get_user_from_identifier(
+        &self,
+        to_search: models::users::UserId,
+    ) -> Option<models::users::User> {
         use crate::schema::emtm_users::dsl::*;
         use db_models::users::*;
+        use models::users::UserId;
 
-        let results = emtm_users
-            .filter(uid.eq(to_search))
-            .load::<User>(&self.connection);
+        let table = emtm_users;
 
-        let db_u = {
-            match results {
-                Ok(mut users) => {
-                    if users.is_empty() {
-                        return None;
-                    } else {
-                        //Get first element
-                        users.swap_remove(0)
+        let query_result = {
+            match to_search {
+                UserId::Uid(id) => table.filter(uid.eq(id)).load::<User>(&self.connection),
+                UserId::WechatId(id) => table
+                    .filter(wechat_id.eq(id))
+                    .load::<User>(&self.connection),
+                UserId::Phone(p) => table
+                    .filter(phone.eq(p))
+                    .load::<User>(&self.connection),
+                UserId::Email(em) => table
+                    .filter(email.eq(em))
+                    .load::<User>(&self.connection),
+                UserId::SchoolInfo(school_id, student_id) => {
+                    match self.get_student_uid_from_school_info(school_id, student_id) {
+                        Some(id) => table
+                            .filter(uid.eq(id))
+                            .load::<User>(&self.connection),
+                        None => {
+                            return None;
+                        }
                     }
-                }
-                Err(error) => {
-                    error!("Panic when querying user with uid {}: {}", to_search, error);
-                    panic!(error.to_string());
                 }
             }
         };
 
-        self.get_user_from_db_user(db_u)
-    }
-
-    fn get_user_from_username(&self, name: &str) -> Option<models::users::User> {
-        use crate::schema::emtm_users::dsl::*;
-        use db_models::users::*;
-
-        let results = emtm_users
-            .filter(username.eq(name))
-            .load::<User>(&self.connection);
-
         let db_u = {
-            match results {
+            match query_result {
                 Ok(mut users) => {
                     if users.is_empty() {
                         return None;
@@ -394,7 +397,10 @@ impl UserController for Controller {
                     }
                 }
                 Err(error) => {
-                    error!("Panic when querying user with username {}: {}", name, error);
+                    error!(
+                        "Panic when querying user with uid {:?}: {}",
+                        to_search, error
+                    );
                     panic!(error.to_string());
                 }
             }
@@ -433,29 +439,6 @@ impl UserController for Controller {
                     db_u.user_type, db_u.uid
                 );
                 None
-            }
-        }
-    }
-
-    fn get_db_user_from_username(&self, name: &str) -> Option<db_models::users::User> {
-        use crate::schema::emtm_users::dsl::*;
-        use db_models::users::*;
-
-        let results = emtm_users
-            .filter(username.eq(name))
-            .load::<User>(&self.connection);
-        match results {
-            Ok(mut users) => {
-                if users.is_empty() {
-                    None
-                } else {
-                    //Get first element
-                    Some(users.swap_remove(0))
-                }
-            }
-            Err(error) => {
-                error!("Panic when querying user with username {}: {}", name, error);
-                panic!(error.to_string());
             }
         }
     }
@@ -533,6 +516,31 @@ impl UserController for Controller {
                     "Panic when querying user type with uid {}: {}",
                     to_search, error
                 );
+                panic!(error.to_string());
+            }
+        }
+    }
+
+    fn get_student_uid_from_school_info(&self, school_id_: i32, student_id_: &str) -> Option<i32> {
+        use crate::schema::emtm_students::dsl::*;
+
+        let results = emtm_students
+            .filter(school_id.eq(school_id_))
+            .filter(student_id.eq(student_id_))
+            .select(uid)
+            .load::<i32>(&self.connection);
+
+        match results {
+            Ok(mut students) => {
+                if students.is_empty() {
+                    None
+                } else {
+                    //Get first element
+                    Some(students.swap_remove(0))
+                }
+            }
+            Err(error) => {
+                error!("Panic when querying student with school info: {}", error);
                 panic!(error.to_string());
             }
         }
