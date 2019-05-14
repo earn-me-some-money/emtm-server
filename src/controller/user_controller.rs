@@ -20,7 +20,7 @@ pub trait UserController {
     /// * 'new_user' - A vector containing the user to be added
     fn add_db_user(
         &self,
-        new_user: &db_models::users::NewUser,
+        new_user: db_models::users::NewUser,
     ) -> Result<db_models::users::User, DbError>;
 
     // Update Users
@@ -30,11 +30,11 @@ pub trait UserController {
     /// * 'updated_users' - The list of users to be updated
     fn update_users(&self, updated_users: &Vec<models::users::User>) -> Vec<Result<(), DbError>>;
     /// Helper functions, update db user
-    fn update_db_user(&self, db_user: &db_models::users::User) -> Result<(), DbError>;
+    fn update_db_user(&self, db_user: db_models::users::User) -> Result<(), DbError>;
     /// Helper functions, update db cow
-    fn update_db_cow(&self, db_cow: &db_models::users::Cow) -> Result<(), DbError>;
+    fn update_db_cow(&self, db_cow: db_models::users::Cow) -> Result<(), DbError>;
     /// Helper functions, update db student
-    fn update_db_student(&self, db_student: &db_models::users::Student) -> Result<(), DbError>;
+    fn update_db_student(&self, db_student: db_models::users::Student) -> Result<(), DbError>;
 
     //Query Users
     /// Query a user from a given user identifier, returns None if user doesn't exist
@@ -84,7 +84,7 @@ impl UserController for Controller {
                 tokens: cow.tokens,
                 user_type: 0,
             };
-            u_results.push(self.add_db_user(&db_u))
+            u_results.push(self.add_db_user(db_u))
         }
 
         // insert into cow table
@@ -144,7 +144,7 @@ impl UserController for Controller {
                 tokens: student.tokens,
                 user_type: 1,
             };
-            u_results.push(self.add_db_user(&db_u))
+            u_results.push(self.add_db_user(db_u))
         }
 
         let mut results = vec![];
@@ -196,11 +196,11 @@ impl UserController for Controller {
 
     fn add_db_user(
         &self,
-        new_user: &db_models::users::NewUser,
+        new_user: db_models::users::NewUser,
     ) -> Result<db_models::users::User, DbError> {
         use crate::schema::emtm_users;
         let result = diesel::insert_into(emtm_users::table)
-            .values(new_user)
+            .values(&new_user)
             .execute(&self.connection);
 
         match result {
@@ -258,9 +258,9 @@ impl UserController for Controller {
                     }
                     // Update user and student table
                     let (db_u, db_s) = s.to_db();
-                    let u_res = self.update_db_user(&db_u);
+                    let u_res = self.update_db_user(db_u);
                     if let Ok(_) = u_res {
-                        let s_res = self.update_db_student(&db_s);
+                        let s_res = self.update_db_student(db_s);
                         results.push(s_res);
                     } else {
                         results.push(u_res);
@@ -284,9 +284,9 @@ impl UserController for Controller {
                         continue;
                     }
                     let (db_u, db_c) = c.to_db();
-                    let u_res = self.update_db_user(&db_u);
+                    let u_res = self.update_db_user(db_u);
                     if let Ok(_) = u_res {
-                        let c_res = self.update_db_cow(&db_c);
+                        let c_res = self.update_db_cow(db_c);
                         results.push(c_res);
                     } else {
                         results.push(u_res);
@@ -297,11 +297,11 @@ impl UserController for Controller {
         results
     }
 
-    fn update_db_user(&self, db_user: &db_models::users::User) -> Result<(), DbError> {
+    fn update_db_user(&self, db_user: db_models::users::User) -> Result<(), DbError> {
         // UPDATE `emtm_users` SET [...]
         // WHERE `emtm_users`.`uid` = db_user.uid
-        let update_res = diesel::update(db_user)
-            .set(db_user)
+        let update_res = diesel::update(&db_user)
+            .set(&db_user)
             .execute(&self.connection);
 
         match update_res {
@@ -316,9 +316,9 @@ impl UserController for Controller {
         }
     }
 
-    fn update_db_cow(&self, db_cow: &db_models::users::Cow) -> Result<(), DbError> {
-        let update_res = diesel::update(db_cow)
-            .set(db_cow)
+    fn update_db_cow(&self, db_cow: db_models::users::Cow) -> Result<(), DbError> {
+        let update_res = diesel::update(&db_cow)
+            .set(&db_cow)
             .execute(&self.connection);
         match update_res {
             Ok(row) => {
@@ -332,9 +332,9 @@ impl UserController for Controller {
         }
     }
 
-    fn update_db_student(&self, db_student: &db_models::users::Student) -> Result<(), DbError> {
-        let update_res = diesel::update(db_student)
-            .set(db_student)
+    fn update_db_student(&self, db_student: db_models::users::Student) -> Result<(), DbError> {
+        let update_res = diesel::update(&db_student)
+            .set(&db_student)
             .execute(&self.connection);
         match update_res {
             Ok(row) => {

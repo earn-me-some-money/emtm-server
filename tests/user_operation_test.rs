@@ -2,7 +2,6 @@ use emtm_db;
 use emtm_db::controller::Controller;
 use emtm_db::controller::UserController;
 use emtm_db::models::users::*;
-use emtm_db::models::users::UserId::WechatId;
 
 
 #[test]
