@@ -18,7 +18,6 @@ pub struct Student {
     pub year: i32,
 }
 
-
 impl Student {
     /// Create a User from a database user and database student
     pub fn from_db(u: db_models::users::User, s: db_models::users::Student) -> Self {
@@ -42,25 +41,28 @@ impl Student {
 
     /// Get the user and student for database storage
     pub fn to_db(&self) -> (db_models::users::User, db_models::users::Student) {
-        (db_models::users::User {
-            uid: self.uid,
-            wechat_id: self.wechat_id.clone(),
-            phone: self.phone.clone(),
-            personal_info: self.personal_info.clone(),
-            email: self.email.clone(),
-            username: self.username.clone(),
-            verified: self.verified,
-            tokens: self.tokens,
-            user_type: 1
-        }, db_models::users::Student {
-            uid: self.uid,
-            school_id: self.school_id,
-            credit: self.credit,
-            accepted: self.accepted,
-            finished: self.finished,
-            major: self.major.clone(),
-            year: self.year,
-        })
+        (
+            db_models::users::User {
+                uid: self.uid,
+                wechat_id: self.wechat_id.clone(),
+                phone: self.phone.clone(),
+                personal_info: self.personal_info.clone(),
+                email: self.email.clone(),
+                username: self.username.clone(),
+                verified: self.verified,
+                tokens: self.tokens,
+                user_type: 1,
+            },
+            db_models::users::Student {
+                uid: self.uid,
+                school_id: self.school_id,
+                credit: self.credit,
+                accepted: self.accepted,
+                finished: self.finished,
+                major: self.major.clone(),
+                year: self.year,
+            },
+        )
     }
 }
 
@@ -88,30 +90,32 @@ impl Cow {
             username: u.username,
             verified: u.verified,
             tokens: u.tokens,
-            company: c.company
+            company: c.company,
         }
     }
     pub fn to_db(&self) -> (db_models::users::User, db_models::users::Cow) {
-        (db_models::users::User {
-            uid: self.uid,
-            wechat_id: self.wechat_id.clone(),
-            phone: self.phone.clone(),
-            personal_info: self.personal_info.clone(),
-            email: self.email.clone(),
-            username: self.username.clone(),
-            verified: self.verified,
-            tokens: self.tokens,
-            user_type: 0
-        }, db_models::users::Cow {
-            uid: self.uid,
-            company: self.company.clone()
-        })
+        (
+            db_models::users::User {
+                uid: self.uid,
+                wechat_id: self.wechat_id.clone(),
+                phone: self.phone.clone(),
+                personal_info: self.personal_info.clone(),
+                email: self.email.clone(),
+                username: self.username.clone(),
+                verified: self.verified,
+                tokens: self.tokens,
+                user_type: 0,
+            },
+            db_models::users::Cow {
+                uid: self.uid,
+                company: self.company.clone(),
+            },
+        )
     }
 }
 
 #[derive(Debug, Clone)]
 pub enum User {
     Student(Student),
-    Cow(Cow)
+    Cow(Cow),
 }
-

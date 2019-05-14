@@ -1,16 +1,16 @@
-use std::fmt;
 use std::error;
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct DbError {
-    why: String
+    why: String,
 }
 
 /// The error type used by db controller
 impl DbError {
     pub fn new(why: &str) -> Self {
         Self {
-            why: why.to_string()
+            why: why.to_string(),
         }
     }
 }
@@ -21,9 +21,4 @@ impl fmt::Display for DbError {
     }
 }
 
-impl error::Error for DbError {
-
-}
-
-
-
+impl error::Error for DbError {}

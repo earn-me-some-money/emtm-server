@@ -3,10 +3,9 @@ use crate::schema::*;
 pub const TYPE_COW: i8 = 0;
 pub const TYPE_STUDENT: i8 = 1;
 
-#[derive(Queryable,Debug,Clone)]
-#[derive(AsChangeset,Identifiable)]
+#[derive(Queryable, Debug, Clone, AsChangeset, Identifiable)]
 #[primary_key(uid)]
-#[table_name="emtm_users"]
+#[table_name = "emtm_users"]
 pub struct User {
     pub uid: i32,
     pub wechat_id: String,
@@ -16,11 +15,11 @@ pub struct User {
     pub username: String,
     pub verified: bool,
     pub tokens: i32,
-    pub user_type: i8
+    pub user_type: i8,
 }
 
-#[derive(Insertable,Debug,Clone)]
-#[table_name="emtm_users"]
+#[derive(Insertable, Debug, Clone)]
+#[table_name = "emtm_users"]
 pub struct NewUser<'a> {
     pub wechat_id: &'a str,
     pub phone: &'a str,
@@ -29,14 +28,12 @@ pub struct NewUser<'a> {
     pub username: &'a str,
     pub verified: bool,
     pub tokens: i32,
-    pub user_type: i8
+    pub user_type: i8,
 }
 
-
-#[derive(Queryable,Debug,Clone)]
-#[derive(AsChangeset,Identifiable)]
+#[derive(Queryable, Debug, Clone, AsChangeset, Identifiable)]
 #[primary_key(uid)]
-#[table_name="emtm_students"]
+#[table_name = "emtm_students"]
 pub struct Student {
     pub uid: i32,
     pub school_id: i32,
@@ -47,8 +44,8 @@ pub struct Student {
     pub year: i32,
 }
 
-#[derive(Insertable,Debug,Clone)]
-#[table_name="emtm_students"]
+#[derive(Insertable, Debug, Clone)]
+#[table_name = "emtm_students"]
 pub struct NewStudent<'a> {
     pub uid: i32,
     pub school_id: i32,
@@ -59,19 +56,16 @@ pub struct NewStudent<'a> {
     pub year: i32,
 }
 
-
-#[derive(Queryable,Debug,Clone)]
-#[derive(AsChangeset,Identifiable)]
+#[derive(Queryable, Debug, Clone, AsChangeset, Identifiable)]
 #[primary_key(uid)]
-#[table_name="emtm_cows"]
+#[table_name = "emtm_cows"]
 pub struct Cow {
     pub uid: i32,
     pub company: String,
 }
 
-
-#[derive(Insertable,Debug,Clone)]
-#[table_name="emtm_cows"]
+#[derive(Insertable, Debug, Clone)]
+#[table_name = "emtm_cows"]
 pub struct NewCow<'a> {
     pub uid: i32,
     pub company: &'a str,

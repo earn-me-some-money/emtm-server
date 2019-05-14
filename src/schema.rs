@@ -41,9 +41,4 @@ table! {
 joinable!(emtm_cows -> emtm_users (uid));
 joinable!(emtm_students -> emtm_users (uid));
 
-allow_tables_to_appear_in_same_query!(
-    emtm_cows,
-    emtm_students,
-    emtm_users,
-    school_zh,
-);
+allow_tables_to_appear_in_same_query!(emtm_cows, emtm_students, emtm_users, school_zh,);

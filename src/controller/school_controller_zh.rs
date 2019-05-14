@@ -1,10 +1,10 @@
 use crate::controller::Controller;
 use diesel::prelude::*;
 
-#[derive(Queryable,Debug,Clone)]
+#[derive(Queryable, Debug, Clone)]
 pub struct School {
     pub school_id: i32,
-    pub school_name: String
+    pub school_name: String,
 }
 
 pub trait SchoolControllerZh {
@@ -39,7 +39,10 @@ impl SchoolControllerZh for Controller {
                 }
             }
             Err(error) => {
-                error!("Panic when querying school with id {} because: {}", id, error);
+                error!(
+                    "Panic when querying school with id {} because: {}",
+                    id, error
+                );
                 panic!(error.to_string());
             }
         }
@@ -61,7 +64,10 @@ impl SchoolControllerZh for Controller {
                 }
             }
             Err(error) => {
-                error!("Panic when querying school with name {} because: {}", name, error);
+                error!(
+                    "Panic when querying school with name {} because: {}",
+                    name, error
+                );
                 panic!(error.to_string());
             }
         }
@@ -70,8 +76,7 @@ impl SchoolControllerZh for Controller {
     fn get_school_list(&self) -> Vec<School> {
         use crate::schema::school_zh::dsl::*;
 
-        let results = school_zh
-            .load::<School>(&self.connection);
+        let results = school_zh.load::<School>(&self.connection);
 
         match results {
             Ok(schools) => schools,

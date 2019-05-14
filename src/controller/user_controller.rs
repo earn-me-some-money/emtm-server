@@ -18,8 +18,10 @@ pub trait UserController {
     /// Helper function for add_cows and add_db_user, returns the added user
     /// # Arguments
     /// * 'new_user' - A vector containing the user to be added
-    fn add_db_user(&self, new_user: db_models::users::NewUser) -> Result<db_models::users::User, DbError>;
-
+    fn add_db_user(
+        &self,
+        new_user: db_models::users::NewUser,
+    ) -> Result<db_models::users::User, DbError>;
 
     // Update Users
     /// Update users according to the uid fields of the given user enum instances.
@@ -27,11 +29,12 @@ pub trait UserController {
     /// # Arguments
     /// * 'updated_users' - The list of users to be updated
     fn update_users(&self, updated_users: &Vec<models::users::User>) -> Vec<Result<(), DbError>>;
-    /// Helper functions, update db model instances
+    /// Helper functions, update db user
     fn update_db_user(&self, db_user: db_models::users::User) -> Result<(), DbError>;
+    /// Helper functions, update db cow
     fn update_db_cow(&self, db_cow: db_models::users::Cow) -> Result<(), DbError>;
+    /// Helper functions, update db student
     fn update_db_student(&self, db_student: db_models::users::Student) -> Result<(), DbError>;
-
 
     //Query Users
     /// Query a user from a given uid, returns None if user doesn't exist
@@ -105,7 +108,10 @@ impl UserController for Controller {
                                 Ok(user.uid)
                             }
                             None => {
-                                warn!("Failed to add cow with username {}, unknown error", cow.username);
+                                warn!(
+                                    "Failed to add cow with username {}, unknown error",
+                                    cow.username
+                                );
                                 Err(DbError::new("unknown error"))
                             }
                         }
@@ -166,7 +172,10 @@ impl UserController for Controller {
                                 Ok(user.uid)
                             }
                             None => {
-                                warn!("Failed to add student with username {}, unknown error", student.username);
+                                warn!(
+                                    "Failed to add student with username {}, unknown error",
+                                    student.username
+                                );
                                 Err(DbError::new("unknown error"))
                             }
                         }
@@ -184,8 +193,10 @@ impl UserController for Controller {
         results
     }
 
-
-    fn add_db_user(&self, new_user: db_models::users::NewUser) -> Result<db_models::users::User, DbError> {
+    fn add_db_user(
+        &self,
+        new_user: db_models::users::NewUser,
+    ) -> Result<db_models::users::User, DbError> {
         use crate::schema::emtm_users;
         let result = diesel::insert_into(emtm_users::table)
             .values(&new_user)
@@ -200,13 +211,19 @@ impl UserController for Controller {
                         Ok(u)
                     }
                     None => {
-                        warn!("Failed to add user with username {}, unknown error", new_user.username);
+                        warn!(
+                            "Failed to add user with username {}, unknown error",
+                            new_user.username
+                        );
                         Err(DbError::new("unknown error"))
                     }
                 }
             }
             Err(error) => {
-                info!("Failed to add user with username {}: {}", new_user.username, error);
+                info!(
+                    "Failed to add user with username {}: {}",
+                    new_user.username, error
+                );
                 Err(DbError::new(&error.to_string()))
             }
         }
@@ -222,11 +239,17 @@ impl UserController for Controller {
                     let u_type = self.get_user_type_from_uid(s.uid);
                     if let Some(ty) = u_type {
                         if ty != db_models::users::TYPE_STUDENT {
-                            results.push(Err(DbError::new(&format!("cannot change type of uid {} to student", s.uid))));
+                            results.push(Err(DbError::new(&format!(
+                                "cannot change type of uid {} to student",
+                                s.uid
+                            ))));
                             continue;
                         }
                     } else {
-                        results.push(Err(DbError::new(&format!("cannot find user with uid {}", s.uid))));
+                        results.push(Err(DbError::new(&format!(
+                            "cannot find user with uid {}",
+                            s.uid
+                        ))));
                         continue;
                     }
                     // Update user and student table
@@ -243,11 +266,17 @@ impl UserController for Controller {
                     let u_type = self.get_user_type_from_uid(c.uid);
                     if let Some(ty) = u_type {
                         if ty != db_models::users::TYPE_COW {
-                            results.push(Err(DbError::new(&format!("cannot change type of uid {} to cow", c.uid))));
+                            results.push(Err(DbError::new(&format!(
+                                "cannot change type of uid {} to cow",
+                                c.uid
+                            ))));
                             continue;
                         }
                     } else {
-                        results.push(Err(DbError::new(&format!("cannot find user with uid {}", c.uid))));
+                        results.push(Err(DbError::new(&format!(
+                            "cannot find user with uid {}",
+                            c.uid
+                        ))));
                         continue;
                     }
                     let (db_u, db_c) = c.to_db();
@@ -268,7 +297,8 @@ impl UserController for Controller {
         // UPDATE `emtm_users` SET [...]
         // WHERE `emtm_users`.`uid` = db_user.uid
         let update_res = diesel::update(&db_user)
-            .set(&db_user).execute(&self.connection);
+            .set(&db_user)
+            .execute(&self.connection);
 
         match update_res {
             Ok(row) => {
@@ -284,7 +314,8 @@ impl UserController for Controller {
 
     fn update_db_cow(&self, db_cow: db_models::users::Cow) -> Result<(), DbError> {
         let update_res = diesel::update(&db_cow)
-            .set(&db_cow).execute(&self.connection);
+            .set(&db_cow)
+            .execute(&self.connection);
         match update_res {
             Ok(row) => {
                 info!("Updated {} cow with uid {}", row, db_cow.uid);
@@ -299,23 +330,26 @@ impl UserController for Controller {
 
     fn update_db_student(&self, db_student: db_models::users::Student) -> Result<(), DbError> {
         let update_res = diesel::update(&db_student)
-            .set(&db_student).execute(&self.connection);
+            .set(&db_student)
+            .execute(&self.connection);
         match update_res {
             Ok(row) => {
                 info!("Updated {} student with uid {}", row, db_student.uid);
                 Ok(())
             }
             Err(e) => {
-                warn!("Failed to update student with uid {}: {}", db_student.uid, e);
+                warn!(
+                    "Failed to update student with uid {}: {}",
+                    db_student.uid, e
+                );
                 Err(DbError::new(&e.to_string()))
             }
         }
     }
 
-
     fn get_user_from_uid(&self, to_search: i32) -> Option<models::users::User> {
-        use db_models::users::*;
         use crate::schema::emtm_users::dsl::*;
+        use db_models::users::*;
 
         let results = emtm_users
             .filter(uid.eq(to_search))
@@ -341,10 +375,9 @@ impl UserController for Controller {
         self.get_user_from_db_user(db_u)
     }
 
-
     fn get_user_from_username(&self, name: &str) -> Option<models::users::User> {
-        use db_models::users::*;
         use crate::schema::emtm_users::dsl::*;
+        use db_models::users::*;
 
         let results = emtm_users
             .filter(username.eq(name))
@@ -377,9 +410,7 @@ impl UserController for Controller {
             db_models::users::TYPE_COW => {
                 let db_c = self.get_cow_from_uid(db_u.uid);
                 match db_c {
-                    Some(c) => {
-                        Some(User::Cow(models::users::Cow::from_db(db_u, c)))
-                    }
+                    Some(c) => Some(User::Cow(models::users::Cow::from_db(db_u, c))),
                     None => {
                         warn!("Cow user with uid {} can't be found in cow table", db_u.uid);
                         None
@@ -389,9 +420,7 @@ impl UserController for Controller {
             db_models::users::TYPE_STUDENT => {
                 let db_s = self.get_student_from_uid(db_u.uid);
                 match db_s {
-                    Some(s) => {
-                        Some(User::Student(models::users::Student::from_db(db_u, s)))
-                    }
+                    Some(s) => Some(User::Student(models::users::Student::from_db(db_u, s))),
                     None => {
                         warn!("Cow user with uid {} can't be found in cow table", db_u.uid);
                         None
@@ -399,15 +428,18 @@ impl UserController for Controller {
                 }
             }
             _ => {
-                warn!("Unexpected user type {} when querying uid {}", db_u.user_type, db_u.uid);
+                warn!(
+                    "Unexpected user type {} when querying uid {}",
+                    db_u.user_type, db_u.uid
+                );
                 None
             }
         }
     }
 
     fn get_db_user_from_username(&self, name: &str) -> Option<db_models::users::User> {
-        use db_models::users::*;
         use crate::schema::emtm_users::dsl::*;
+        use db_models::users::*;
 
         let results = emtm_users
             .filter(username.eq(name))
@@ -428,10 +460,9 @@ impl UserController for Controller {
         }
     }
 
-
     fn get_cow_from_uid(&self, to_search: i32) -> Option<db_models::users::Cow> {
-        use db_models::users::*;
         use crate::schema::emtm_cows::dsl::*;
+        use db_models::users::*;
 
         let results = emtm_cows
             .filter(uid.eq(to_search))
@@ -453,10 +484,9 @@ impl UserController for Controller {
         }
     }
 
-
     fn get_student_from_uid(&self, to_search: i32) -> Option<db_models::users::Student> {
-        use db_models::users::*;
         use crate::schema::emtm_students::dsl::*;
+        use db_models::users::*;
 
         let results = emtm_students
             .filter(uid.eq(to_search))
@@ -472,7 +502,10 @@ impl UserController for Controller {
                 }
             }
             Err(error) => {
-                error!("Panic when querying student with uid {}: {}", to_search, error);
+                error!(
+                    "Panic when querying student with uid {}: {}",
+                    to_search, error
+                );
                 panic!(error.to_string());
             }
         }
@@ -483,7 +516,8 @@ impl UserController for Controller {
 
         let results = emtm_users
             .filter(uid.eq(to_search))
-            .select(user_type).load::<i8>(&self.connection);
+            .select(user_type)
+            .load::<i8>(&self.connection);
 
         match results {
             Ok(mut types) => {
@@ -495,7 +529,10 @@ impl UserController for Controller {
                 }
             }
             Err(error) => {
-                error!("Panic when querying user type with uid {}: {}", to_search, error);
+                error!(
+                    "Panic when querying user type with uid {}: {}",
+                    to_search, error
+                );
                 panic!(error.to_string());
             }
         }

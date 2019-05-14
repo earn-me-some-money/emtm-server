@@ -2,8 +2,8 @@ extern crate emtm_db;
 extern crate pretty_env_logger;
 
 use emtm_db::controller::controller::Controller;
-use emtm_db::controller::user_controller::UserController;
 use emtm_db::controller::school_controller_zh::SchoolControllerZh;
+use emtm_db::controller::user_controller::UserController;
 
 use emtm_db::models::users::*;
 
@@ -11,7 +11,6 @@ fn main() {
     pretty_env_logger::init_timed();
 
     let ctrl = Controller::new();
-
 
     let users = vec![
         User::Student(Student {
@@ -28,7 +27,7 @@ fn main() {
             accepted: 0,
             finished: 0,
             major: "SE".to_string(),
-            year: 0
+            year: 0,
         }),
         User::Cow(Cow {
             uid: 1,
@@ -39,8 +38,8 @@ fn main() {
             username: "update1".to_string(),
             verified: false,
             tokens: 0,
-            company: "sa".to_string()
-        })
+            company: "sa".to_string(),
+        }),
     ];
 
     println!("{:?}", ctrl.update_users(&users));

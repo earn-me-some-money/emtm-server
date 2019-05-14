@@ -7,5 +7,7 @@ fn main() {
     pretty_env_logger::init_timed();
 
     let ctrl = Controller::new();
+
+    ctrl.revert_all();
     ctrl.migrate();
 }

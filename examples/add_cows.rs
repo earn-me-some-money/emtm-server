@@ -21,7 +21,7 @@ fn main() {
             username: "adsf333".to_string(),
             verified: false,
             tokens: 0,
-            company: "sun".to_string()
+            company: "sun".to_string(),
         },
         Cow {
             uid: 1,
@@ -32,8 +32,8 @@ fn main() {
             username: "ads1233f".to_string(),
             verified: false,
             tokens: 0,
-            company: "sa".to_string()
-        }
+            company: "sa".to_string(),
+        },
     ];
 
     println!("{:?}", ctrl.add_cows(cows));
