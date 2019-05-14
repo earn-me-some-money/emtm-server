@@ -367,17 +367,11 @@ impl UserController for Controller {
                 UserId::WechatId(id) => table
                     .filter(wechat_id.eq(id))
                     .load::<User>(&self.connection),
-                UserId::Phone(p) => table
-                    .filter(phone.eq(p))
-                    .load::<User>(&self.connection),
-                UserId::Email(em) => table
-                    .filter(email.eq(em))
-                    .load::<User>(&self.connection),
+                UserId::Phone(p) => table.filter(phone.eq(p)).load::<User>(&self.connection),
+                UserId::Email(em) => table.filter(email.eq(em)).load::<User>(&self.connection),
                 UserId::SchoolInfo(school_id, student_id) => {
                     match self.get_student_uid_from_school_info(school_id, student_id) {
-                        Some(id) => table
-                            .filter(uid.eq(id))
-                            .load::<User>(&self.connection),
+                        Some(id) => table.filter(uid.eq(id)).load::<User>(&self.connection),
                         None => {
                             return None;
                         }
