@@ -42,7 +42,6 @@ impl Controller {
             Ok(_) => {}
             Err(error) => {
                 error!("Error when running migrations: {}", error);
-                panic!(error);
             }
         }
     }

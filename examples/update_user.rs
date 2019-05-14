@@ -23,6 +23,7 @@ fn main() {
             verified: false,
             tokens: 0,
             school_id: ctrl.get_school_id("中山大学").unwrap(),
+            student_id: "16340023".to_string(),
             credit: 0,
             accepted: 0,
             finished: 0,

@@ -4,13 +4,6 @@ use emtm_db::controller::UserController;
 use emtm_db::models::users::*;
 use emtm_db::models::users::UserId::WechatId;
 
-#[test]
-fn migration_test() {
-    let ctrl = Controller::test_new();
-
-    ctrl.revert_all();
-    ctrl.migrate();
-}
 
 #[test]
 fn add_cow_test() {
