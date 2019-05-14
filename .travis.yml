@@ -9,7 +9,7 @@ services:
   - mysql
 
 env:
-  - DATABASE_URL=mysql://travis:@127.0.0.1/EMTM
+  - DATABASE_URL=mysql://travis:@127.0.0.1/EMTM_TEST
 
 addons:
   apt:
@@ -28,7 +28,6 @@ git:
   submodules: true
 
 before_install:
-  - sh ./scripts/setup_db.sh
   - sh ./scripts/setup_test_db.sh
 
 matrix:
