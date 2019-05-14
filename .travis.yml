@@ -29,6 +29,7 @@ git:
 
 before_install:
   - sh ./scripts/setup_db.sh
+  - sh ./scripts/setup_test_db.sh
 
 matrix:
   fast_finish: true
