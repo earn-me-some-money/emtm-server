@@ -1,8 +1,8 @@
 extern crate emtm_db;
 extern crate pretty_env_logger;
 
-use emtm_db::controller::UserController;
 use emtm_db::controller::Controller;
+use emtm_db::controller::UserController;
 
 use emtm_db::models::users::*;
 

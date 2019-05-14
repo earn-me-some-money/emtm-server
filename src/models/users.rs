@@ -1,6 +1,6 @@
 use crate::db_models;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Student {
     pub uid: i32,
     pub wechat_id: String,
@@ -66,7 +66,7 @@ impl Student {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Cow {
     pub uid: i32,
     pub wechat_id: String,
@@ -114,7 +114,7 @@ impl Cow {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum User {
     Student(Student),
     Cow(Cow),

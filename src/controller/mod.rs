@@ -2,8 +2,8 @@ mod connection;
 pub mod school_controller_zh;
 pub mod user_controller;
 
-pub use self::user_controller::UserController;
 pub use self::school_controller_zh::SchoolControllerZh;
+pub use self::user_controller::UserController;
 
 use diesel::mysql::MysqlConnection;
 use dotenv::dotenv;
@@ -13,6 +13,8 @@ use std::env;
 pub struct Controller {
     pub connection: MysqlConnection,
 }
+
+unsafe impl Sync for Controller {}
 
 impl Controller {
     pub fn new() -> Self {

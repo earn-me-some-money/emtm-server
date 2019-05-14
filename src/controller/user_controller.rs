@@ -56,11 +56,11 @@ pub trait UserController {
     /// Query a cow from a given uid
     /// # Arguments
     /// * 'to_search' - The uid to be searched
-    fn get_cow_from_uid(&self, to_search: i32) -> Option<db_models::users::Cow>;
+    fn get_db_cow_from_uid(&self, to_search: i32) -> Option<db_models::users::Cow>;
     /// Query a cow from a given uid
     /// # Arguments
     /// * 'to_search' - The uid to be searched
-    fn get_student_from_uid(&self, to_search: i32) -> Option<db_models::users::Student>;
+    fn get_db_student_from_uid(&self, to_search: i32) -> Option<db_models::users::Student>;
     /// Get the user type of a user from uid
     /// # Arguments
     /// * 'to_search' - The uid to be searched
@@ -101,7 +101,7 @@ impl UserController for Controller {
                     .execute(&self.connection);
                 results.push(match res {
                     Ok(_) => {
-                        let db_cow = self.get_cow_from_uid(user.uid);
+                        let db_cow = self.get_db_cow_from_uid(user.uid);
                         match db_cow {
                             Some(_cow) => {
                                 info!("Successfully added cow with uid {}", user.uid);
@@ -165,7 +165,7 @@ impl UserController for Controller {
                     .execute(&self.connection);
                 results.push(match res {
                     Ok(_) => {
-                        let db_student = self.get_student_from_uid(user.uid);
+                        let db_student = self.get_db_student_from_uid(user.uid);
                         match db_student {
                             Some(_student) => {
                                 info!("Successfully added student with uid {}", user.uid);
@@ -408,7 +408,7 @@ impl UserController for Controller {
 
         match db_u.user_type {
             db_models::users::TYPE_COW => {
-                let db_c = self.get_cow_from_uid(db_u.uid);
+                let db_c = self.get_db_cow_from_uid(db_u.uid);
                 match db_c {
                     Some(c) => Some(User::Cow(models::users::Cow::from_db(db_u, c))),
                     None => {
@@ -418,7 +418,7 @@ impl UserController for Controller {
                 }
             }
             db_models::users::TYPE_STUDENT => {
-                let db_s = self.get_student_from_uid(db_u.uid);
+                let db_s = self.get_db_student_from_uid(db_u.uid);
                 match db_s {
                     Some(s) => Some(User::Student(models::users::Student::from_db(db_u, s))),
                     None => {
@@ -460,7 +460,7 @@ impl UserController for Controller {
         }
     }
 
-    fn get_cow_from_uid(&self, to_search: i32) -> Option<db_models::users::Cow> {
+    fn get_db_cow_from_uid(&self, to_search: i32) -> Option<db_models::users::Cow> {
         use crate::schema::emtm_cows::dsl::*;
         use db_models::users::*;
 
@@ -484,7 +484,7 @@ impl UserController for Controller {
         }
     }
 
-    fn get_student_from_uid(&self, to_search: i32) -> Option<db_models::users::Student> {
+    fn get_db_student_from_uid(&self, to_search: i32) -> Option<db_models::users::Student> {
         use crate::schema::emtm_students::dsl::*;
         use db_models::users::*;
 
