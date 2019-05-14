@@ -14,7 +14,7 @@ pub struct Controller {
     pub connection: MysqlConnection,
 }
 
-unsafe impl Sync for Controller {}
+unsafe impl Send for Controller {}
 
 impl Controller {
     pub fn new() -> Self {
