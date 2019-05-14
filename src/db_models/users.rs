@@ -4,6 +4,9 @@ pub const TYPE_COW: i8 = 0;
 pub const TYPE_STUDENT: i8 = 1;
 
 #[derive(Queryable,Debug,Clone)]
+#[derive(AsChangeset,Identifiable)]
+#[primary_key(uid)]
+#[table_name="emtm_users"]
 pub struct User {
     pub uid: i32,
     pub wechat_id: String,
@@ -31,6 +34,9 @@ pub struct NewUser<'a> {
 
 
 #[derive(Queryable,Debug,Clone)]
+#[derive(AsChangeset,Identifiable)]
+#[primary_key(uid)]
+#[table_name="emtm_students"]
 pub struct Student {
     pub uid: i32,
     pub school_id: i32,
@@ -55,6 +61,9 @@ pub struct NewStudent<'a> {
 
 
 #[derive(Queryable,Debug,Clone)]
+#[derive(AsChangeset,Identifiable)]
+#[primary_key(uid)]
+#[table_name="emtm_cows"]
 pub struct Cow {
     pub uid: i32,
     pub company: String,

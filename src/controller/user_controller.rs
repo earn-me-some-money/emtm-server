@@ -1,36 +1,46 @@
-use crate::controller::Controller;
-use crate::db_models;
-use crate::models;
 use diesel::prelude::*;
 
-pub trait UserController {
+use crate::controller::Controller;
+use crate::db_error::DbError;
+use crate::db_models;
+use crate::models;
 
+pub trait UserController {
     //Add Users
     /// Add cows with a vector of Cows, returns the uid of added cows
     /// # Arguments
     /// * 'cows' - A vector containing all the cow instances to be added
-    fn add_cows(&self, cows: Vec<models::users::Cow>) -> Vec<Result<(i32), String>>;
+    fn add_cows(&self, cows: Vec<models::users::Cow>) -> Vec<Result<(i32), DbError>>;
     /// Add students with a vector of Students, returns the uid of added students
     /// # Arguments
     /// * 'students' - A vector containing all the student instances to be added
-    fn add_students(&self, students: Vec<models::users::Student>) -> Vec<Result<(i32), String>>;
+    fn add_students(&self, students: Vec<models::users::Student>) -> Vec<Result<(i32), DbError>>;
     /// Helper function for add_cows and add_db_user, returns the added user
     /// # Arguments
     /// * 'new_user' - A vector containing the user to be added
-    fn add_db_user(&self, new_user: db_models::users::NewUser) -> Result<db_models::users::User, String>;
+    fn add_db_user(&self, new_user: db_models::users::NewUser) -> Result<db_models::users::User, DbError>;
 
 
     // Update Users
+    /// Update users according to the uid fields of the given user enum instances.
+    /// all fields except for the uid fields will be updated.
+    /// # Arguments
+    /// * 'updated_users' - The list of users to be updated
+    fn update_users(&self, updated_users: &Vec<models::users::User>) -> Vec<Result<(), DbError>>;
+    /// Helper functions, update db model instances
+    fn update_db_user(&self, db_user: db_models::users::User) -> Result<(), DbError>;
+    fn update_db_cow(&self, db_cow: db_models::users::Cow) -> Result<(), DbError>;
+    fn update_db_student(&self, db_student: db_models::users::Student) -> Result<(), DbError>;
 
 
     //Query Users
     /// Query a user from a given uid, returns None if user doesn't exist
     /// # Arguments
-    /// * 'to_search' - The uid to be search
+    /// * 'to_search' - The uid to be searched
     fn get_user_from_uid(&self, to_search: i32) -> Option<models::users::User>;
     /// Query a user from a given username
     /// # Arguments
-    /// * 'name' - The username to be search
+    /// * 'name' - The username to be searched
     fn get_user_from_username(&self, name: &str) -> Option<models::users::User>;
     /// Helper function, returns a user enum from a given db user
     /// # Arguments
@@ -38,21 +48,24 @@ pub trait UserController {
     fn get_user_from_db_user(&self, u: db_models::users::User) -> Option<models::users::User>;
     /// Query a db user from a given username
     /// # Arguments
-    /// * 'name' - The username to be search
+    /// * 'name' - The username to be searched
     fn get_db_user_from_username(&self, name: &str) -> Option<db_models::users::User>;
     /// Query a cow from a given uid
     /// # Arguments
-    /// * 'to_search' - The uid to be search
+    /// * 'to_search' - The uid to be searched
     fn get_cow_from_uid(&self, to_search: i32) -> Option<db_models::users::Cow>;
     /// Query a cow from a given uid
     /// # Arguments
-    /// * 'to_search' - The uid to be search
+    /// * 'to_search' - The uid to be searched
     fn get_student_from_uid(&self, to_search: i32) -> Option<db_models::users::Student>;
+    /// Get the user type of a user from uid
+    /// # Arguments
+    /// * 'to_search' - The uid to be searched
+    fn get_user_type_from_uid(&self, to_search: i32) -> Option<i8>;
 }
 
 impl UserController for Controller {
-
-    fn add_cows(&self, cows: Vec<models::users::Cow>) -> Vec<Result<(i32), String>> {
+    fn add_cows(&self, cows: Vec<models::users::Cow>) -> Vec<Result<(i32), DbError>> {
         let mut u_results = vec![];
 
         // insert into user table
@@ -66,7 +79,7 @@ impl UserController for Controller {
                 username: &cow.username,
                 verified: cow.verified,
                 tokens: cow.tokens,
-                user_type: 0
+                user_type: 0,
             };
             u_results.push(self.add_db_user(db_u))
         }
@@ -93,24 +106,24 @@ impl UserController for Controller {
                             }
                             None => {
                                 warn!("Failed to add cow with username {}, unknown error", cow.username);
-                                Err("unknown error".to_string())
+                                Err(DbError::new("unknown error"))
                             }
                         }
                     }
                     Err(error) => {
                         info!("Failed to add cow with uid {}: {}", user.uid, error);
-                        Err(error.to_string())
+                        Err(DbError::new(&error.to_string()))
                     }
                 });
             } else if let Err(error) = u_res {
-                results.push(Err(error.to_string()))
+                results.push(Err(DbError::new(&error.to_string())))
             }
         }
 
         results
     }
 
-    fn add_students(&self, students: Vec<models::users::Student>) -> Vec<Result<(i32), String>> {
+    fn add_students(&self, students: Vec<models::users::Student>) -> Vec<Result<(i32), DbError>> {
         let mut u_results = vec![];
 
         for student in &students {
@@ -123,7 +136,7 @@ impl UserController for Controller {
                 username: &student.username,
                 verified: student.verified,
                 tokens: student.tokens,
-                user_type: 1
+                user_type: 1,
             };
             u_results.push(self.add_db_user(db_u))
         }
@@ -138,7 +151,7 @@ impl UserController for Controller {
                     accepted: student.accepted,
                     finished: student.finished,
                     major: &student.major,
-                    year: student.year
+                    year: student.year,
                 };
                 use crate::schema::emtm_students;
                 let res = diesel::insert_into(emtm_students::table)
@@ -154,17 +167,17 @@ impl UserController for Controller {
                             }
                             None => {
                                 warn!("Failed to add student with username {}, unknown error", student.username);
-                                Err("unknown error".to_string())
+                                Err(DbError::new("unknown error"))
                             }
                         }
                     }
                     Err(error) => {
                         info!("Failed to add student with uid {}: {}", user.uid, error);
-                        Err(error.to_string())
+                        Err(DbError::new(&error.to_string()))
                     }
                 });
             } else if let Err(error) = u_res {
-                results.push(Err(error.to_string()))
+                results.push(Err(DbError::new(&error.to_string())))
             }
         }
 
@@ -172,7 +185,7 @@ impl UserController for Controller {
     }
 
 
-    fn add_db_user(&self, new_user: db_models::users::NewUser) -> Result<db_models::users::User, String> {
+    fn add_db_user(&self, new_user: db_models::users::NewUser) -> Result<db_models::users::User, DbError> {
         use crate::schema::emtm_users;
         let result = diesel::insert_into(emtm_users::table)
             .values(&new_user)
@@ -188,24 +201,116 @@ impl UserController for Controller {
                     }
                     None => {
                         warn!("Failed to add user with username {}, unknown error", new_user.username);
-                        Err("unknown error".to_string())
+                        Err(DbError::new("unknown error"))
                     }
                 }
             }
             Err(error) => {
                 info!("Failed to add user with username {}: {}", new_user.username, error);
-                Err(error.to_string())
+                Err(DbError::new(&error.to_string()))
             }
         }
     }
 
+    fn update_users(&self, updated_users: &Vec<models::users::User>) -> Vec<Result<(), DbError>> {
+        let mut results = vec![];
+        use models::users::User::*;
+        for user in updated_users {
+            match user {
+                Student(s) => {
+                    // Check type first.
+                    let u_type = self.get_user_type_from_uid(s.uid);
+                    if let Some(ty) = u_type {
+                        if ty != db_models::users::TYPE_STUDENT {
+                            results.push(Err(DbError::new(&format!("cannot change type of uid {} to student", s.uid))));
+                            continue;
+                        }
+                    } else {
+                        results.push(Err(DbError::new(&format!("cannot find user with uid {}", s.uid))));
+                        continue;
+                    }
+                    // Update user and student table
+                    let (db_u, db_s) = s.to_db();
+                    let u_res = self.update_db_user(db_u);
+                    if let Ok(_) = u_res {
+                        let s_res = self.update_db_student(db_s);
+                        results.push(s_res);
+                    } else {
+                        results.push(u_res);
+                    }
+                }
+                Cow(c) => {
+                    let u_type = self.get_user_type_from_uid(c.uid);
+                    if let Some(ty) = u_type {
+                        if ty != db_models::users::TYPE_COW {
+                            results.push(Err(DbError::new(&format!("cannot change type of uid {} to cow", c.uid))));
+                            continue;
+                        }
+                    } else {
+                        results.push(Err(DbError::new(&format!("cannot find user with uid {}", c.uid))));
+                        continue;
+                    }
+                    let (db_u, db_c) = c.to_db();
+                    let u_res = self.update_db_user(db_u);
+                    if let Ok(_) = u_res {
+                        let c_res = self.update_db_cow(db_c);
+                        results.push(c_res);
+                    } else {
+                        results.push(u_res);
+                    }
+                }
+            }
+        }
+        results
+    }
 
+    fn update_db_user(&self, db_user: db_models::users::User) -> Result<(), DbError> {
+        // UPDATE `emtm_users` SET [...]
+        // WHERE `emtm_users`.`uid` = db_user.uid
+        let update_res = diesel::update(&db_user)
+            .set(&db_user).execute(&self.connection);
 
+        match update_res {
+            Ok(row) => {
+                info!("Updated {} user with uid {}", row, db_user.uid);
+                Ok(())
+            }
+            Err(e) => {
+                warn!("Failed to update user with uid {}: {}", db_user.uid, e);
+                Err(DbError::new(&e.to_string()))
+            }
+        }
+    }
 
+    fn update_db_cow(&self, db_cow: db_models::users::Cow) -> Result<(), DbError> {
+        let update_res = diesel::update(&db_cow)
+            .set(&db_cow).execute(&self.connection);
+        match update_res {
+            Ok(row) => {
+                info!("Updated {} cow with uid {}", row, db_cow.uid);
+                Ok(())
+            }
+            Err(e) => {
+                warn!("Failed to update cow with uid {}: {}", db_cow.uid, e);
+                Err(DbError::new(&e.to_string()))
+            }
+        }
+    }
 
-
-
-
+    fn update_db_student(&self, db_student: db_models::users::Student) -> Result<(), DbError> {
+        let update_res = diesel::update(&db_student)
+            .set(&db_student).execute(&self.connection);
+        match update_res {
+            Ok(row) => {
+                info!("Updated {} student with uid {}", row, db_student.uid);
+                Ok(())
+            }
+            Err(e) => {
+                warn!("Failed to update student with uid {}: {}", db_student.uid, e);
+                Err(DbError::new(&e.to_string()))
+            }
+        }
+    }
 
 
     fn get_user_from_uid(&self, to_search: i32) -> Option<models::users::User> {
@@ -307,21 +412,20 @@ impl UserController for Controller {
         let results = emtm_users
             .filter(username.eq(name))
             .load::<User>(&self.connection);
-            match results {
-                Ok(mut users) => {
-                    if users.is_empty() {
-                        None
-                    } else {
-                        //Get first element
-                        Some(users.swap_remove(0))
-                    }
-                }
-                Err(error) => {
-                    error!("Panic when querying user with username {}: {}", name, error);
-                    panic!(error.to_string());
+        match results {
+            Ok(mut users) => {
+                if users.is_empty() {
+                    None
+                } else {
+                    //Get first element
+                    Some(users.swap_remove(0))
                 }
             }
-
+            Err(error) => {
+                error!("Panic when querying user with username {}: {}", name, error);
+                panic!(error.to_string());
+            }
+        }
     }
 
 
@@ -369,6 +473,29 @@ impl UserController for Controller {
             }
             Err(error) => {
                 error!("Panic when querying student with uid {}: {}", to_search, error);
+                panic!(error.to_string());
+            }
+        }
+    }
+
+    fn get_user_type_from_uid(&self, to_search: i32) -> Option<i8> {
+        use crate::schema::emtm_users::dsl::*;
+
+        let results = emtm_users
+            .filter(uid.eq(to_search))
+            .select(user_type).load::<i8>(&self.connection);
+
+        match results {
+            Ok(mut types) => {
+                if types.is_empty() {
+                    None
+                } else {
+                    //Get first element
+                    Some(types.swap_remove(0))
+                }
+            }
+            Err(error) => {
+                error!("Panic when querying user type with uid {}: {}", to_search, error);
                 panic!(error.to_string());
             }
         }

@@ -10,4 +10,5 @@ pub mod schema;
 pub mod db_models;
 pub mod models;
 pub mod controller;
+pub mod db_error;
 
