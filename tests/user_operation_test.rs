@@ -37,7 +37,7 @@ fn add_cow_test() {
         },
     ];
 
-    let mut add_res = ctrl.add_cows(cows.clone());
+    let mut add_res = ctrl.add_cows(&cows);
     cows[0].uid = add_res.remove(0).unwrap();
     cows[1].uid = add_res.remove(0).unwrap();
 

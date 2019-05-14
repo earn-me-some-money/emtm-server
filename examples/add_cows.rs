@@ -36,5 +36,5 @@ fn main() {
         },
     ];
 
-    println!("{:?}", ctrl.add_cows(cows));
+    println!("{:?}", ctrl.add_cows(&cows));
 }

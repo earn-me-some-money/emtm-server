@@ -49,5 +49,5 @@ fn main() {
         },
     ];
 
-    println!("{:?}", ctrl.add_students(students));
+    println!("{:?}", ctrl.add_students(&students));
 }
