@@ -3,3 +3,6 @@ members = [
     "emtm-db",
     "emtm-web"
 ]
+[patch.'https://github.com/earn-me-some-money/emtm-db.git']
+emtm_db = { path = "emtm-db" }
+
