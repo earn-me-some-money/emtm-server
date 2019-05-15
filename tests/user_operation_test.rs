@@ -3,7 +3,6 @@ use emtm_db::controller::Controller;
 use emtm_db::controller::UserController;
 use emtm_db::models::users::*;
 
-
 #[test]
 fn add_cow_test() {
     let ctrl = Controller::test_new();
@@ -58,9 +57,9 @@ fn add_students_test() {
 
     ctrl.revert_all();
     ctrl.migrate();
-    
+
     let mut students = vec![
-        Student{
+        Student {
             uid: 0,
             wechat_id: "student1".to_string(),
             phone: "12312312302".to_string(),
@@ -77,7 +76,7 @@ fn add_students_test() {
             major: "testing".to_string(),
             year: 1,
         },
-        Student{
+        Student {
             uid: 0,
             wechat_id: "student2".to_string(),
             phone: "12312312213".to_string(),
@@ -95,15 +94,58 @@ fn add_students_test() {
             year: 1,
         },
     ];
-    
+
     let mut add_res = ctrl.add_students(&students);
     students[0].uid = add_res.remove(0).unwrap();
     students[1].uid = add_res.remove(0).unwrap();
 
     use emtm_db::models::users::UserId;
-    let student1 = ctrl.get_user_from_identifier(UserId::Uid(students[0].uid)).unwrap();
-    let student2 = ctrl.get_user_from_identifier(UserId::WechatId(&students[1].wechat_id)).unwrap();
+    let student1 = ctrl
+        .get_user_from_identifier(UserId::Uid(students[0].uid))
+        .unwrap();
+    let student2 = ctrl
+        .get_user_from_identifier(UserId::WechatId(&students[1].wechat_id))
+        .unwrap();
 
     assert_eq!(User::Student(students.remove(0)), student1);
     assert_eq!(User::Student(students.remove(0)), student2);
+}
+
+#[test]
+fn update_users_test() {
+    let ctrl = Controller::test_new();
+
+    ctrl.revert_all();
+    ctrl.migrate();
+
+    let mut students = vec![Student {
+        uid: 0,
+        wechat_id: "student1".to_string(),
+        phone: "12312312302".to_string(),
+        personal_info: "ok".to_string(),
+        email: "stduent1@test".to_string(),
+        username: "student1".to_string(),
+        verified: false,
+        tokens: 0,
+        school_id: 11311,
+        student_id: "16340000".to_string(),
+        credit: 0,
+        accepted: 0,
+        finished: 0,
+        major: "testing".to_string(),
+        year: 1,
+    }];
+    let mut add_res = ctrl.add_students(&students);
+    students[0].uid = add_res.remove(0).unwrap();
+    students[0].student_id = "16435555".to_string();
+    students[0].phone = "13714715399".to_string();
+
+    let to_update = vec![User::Student(students[0].clone())];
+    ctrl.update_users(&to_update);
+
+    let student = ctrl
+        .get_user_from_identifier(UserId::Uid(students[0].uid))
+        .unwrap();
+
+    assert_eq!(User::Student(students.remove(0)), student);
 }
