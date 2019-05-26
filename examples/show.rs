@@ -8,7 +8,7 @@ use emtm_db::controller::UserController;
 use emtm_db::models::users::UserId::*;
 
 fn main() {
-    pretty_env_logger::init_timed();
+    pretty_env_logger::try_init_timed_custom_env("EMTM_LOG").unwrap();
 
     let ctrl = Controller::new();
     println!("{:?}", ctrl.get_user_from_identifier(Uid(1)));

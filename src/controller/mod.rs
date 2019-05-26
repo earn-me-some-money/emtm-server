@@ -38,6 +38,7 @@ impl Controller {
     /// Run migrations, panic if migration fails.
     /// The migrations folder must present on the current or parent directory.
     pub fn migrate(&self) {
+        debug!("Migrating");
         let migration_result = diesel_migrations::run_pending_migrations(&self.connection);
         match migration_result {
             Ok(_) => {}
@@ -49,6 +50,7 @@ impl Controller {
 
     /// Revert all migrations
     pub fn revert_all(&self) {
+        debug!("Revert all");
         loop {
             let revert_res = diesel_migrations::revert_latest_migration(&self.connection);
             if let Err(_) = revert_res {

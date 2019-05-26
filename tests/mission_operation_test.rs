@@ -1,32 +1,30 @@
-use emtm_db;
-use emtm_db::controller::Controller;
-use emtm_db::controller::mission_controller::MissionController;
-use emtm_db::models::users::*;
-use emtm_db::models::missions::*;
-use emtm_db::controller::user_controller::UserController;
 use chrono::NaiveDate;
-use chrono::NaiveTime;
 use chrono::NaiveDateTime;
+use chrono::NaiveTime;
+use emtm_db;
+use emtm_db::controller::mission_controller::MissionController;
+use emtm_db::controller::user_controller::UserController;
+use emtm_db::controller::Controller;
+use emtm_db::models::missions::*;
+use emtm_db::models::users::*;
 
 #[test]
-fn add_update_mission_test(){
+fn add_update_mission_test() {
     let ctrl = Controller::test_new();
     ctrl.revert_all();
     ctrl.migrate();
 
-    let mut cows = vec![
-        Cow{
-            uid: 0,
-            wechat_id: "cow1".to_string(),
-            phone: "12312312312".to_string(),
-            personal_info: "nono".to_string(),
-            email: "cow1@test".to_string(),
-            username: "cow1".to_string(),
-            verified: false,
-            tokens: 0,
-            company: "sun".to_string(),
-        },
-    ];
+    let mut cows = vec![Cow {
+        uid: 0,
+        wechat_id: "cow1".to_string(),
+        phone: "12312312312".to_string(),
+        personal_info: "nono".to_string(),
+        email: "cow1@test".to_string(),
+        username: "cow1".to_string(),
+        verified: false,
+        tokens: 0,
+        company: "sun".to_string(),
+    }];
 
     let mut add_cow_res = ctrl.add_cows(&cows);
     cows[0].uid = add_cow_res.remove(0).unwrap();
@@ -38,7 +36,7 @@ fn add_update_mission_test(){
 
     let post_time = NaiveDateTime::new(d, t1);
     let deadline = NaiveDateTime::new(d, t2);
-    let mission = Mission{
+    let mission = Mission {
         mid: 0,
         cow_uid: cows[0].uid,
         bounty: 0,
@@ -57,7 +55,7 @@ fn add_update_mission_test(){
     assert_eq!(mission_list[0].content, "question");
 
     let participants = vec![];
-    let new_mission = Mission{
+    let new_mission = Mission {
         mid: 1,
         cow_uid: cows[0].uid,
         bounty: 0,
@@ -78,24 +76,22 @@ fn add_update_mission_test(){
 }
 
 #[test]
-fn add_update_participants_test(){
+fn add_update_participants_test() {
     let ctrl = Controller::test_new();
     ctrl.revert_all();
     ctrl.migrate();
 
-    let mut cows = vec![
-        Cow{
-            uid: 0,
-            wechat_id: "cow1".to_string(),
-            phone: "12312312312".to_string(),
-            personal_info: "nono".to_string(),
-            email: "cow1@test".to_string(),
-            username: "cow1".to_string(),
-            verified: false,
-            tokens: 0,
-            company: "sun".to_string(),
-        },
-    ];
+    let mut cows = vec![Cow {
+        uid: 0,
+        wechat_id: "cow1".to_string(),
+        phone: "12312312312".to_string(),
+        personal_info: "nono".to_string(),
+        email: "cow1@test".to_string(),
+        username: "cow1".to_string(),
+        verified: false,
+        tokens: 0,
+        company: "sun".to_string(),
+    }];
     let mut add_cow_res = ctrl.add_cows(&cows);
     cows[0].uid = add_cow_res.remove(0).unwrap();
 
@@ -146,7 +142,7 @@ fn add_update_participants_test(){
     let deadline = NaiveDateTime::new(d, t2);
 
     let participants = vec![];
-    let mission = Mission{
+    let mission = Mission {
         mid: 0,
         cow_uid: cows[0].uid,
         bounty: 0,
@@ -162,11 +158,11 @@ fn add_update_participants_test(){
     ctrl.add_mission(&mission).unwrap();
 
     let add_participants = vec![
-        Participant{
+        Participant {
             student_uid: students[0].uid,
             state: PartState::Accepted,
         },
-        Participant{
+        Participant {
             student_uid: students[1].uid,
             state: PartState::Accepted,
         },
@@ -177,11 +173,11 @@ fn add_update_participants_test(){
     assert_eq!(par_list[0].student_uid, students[0].uid);
     assert_eq!(par_list[1].student_uid, students[1].uid);
 
-    let update_par_0 = Participant{
+    let update_par_0 = Participant {
         student_uid: students[0].uid,
         state: PartState::Finished,
     };
-    let update_par_1 = Participant{
+    let update_par_1 = Participant {
         student_uid: students[1].uid,
         state: PartState::Cancelled,
     };
