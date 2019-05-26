@@ -12,9 +12,11 @@ table! {
         bounty -> Integer,
         risk -> Integer,
         name -> Varchar,
+        mission_type -> Tinyint,
         content -> Text,
         post_time -> Datetime,
         deadline -> Datetime,
+        max_participants -> Integer,
     }
 }
 
@@ -65,6 +67,7 @@ joinable!(emtm_missions -> emtm_cows (cow_uid));
 joinable!(emtm_participants -> emtm_missions (mid));
 joinable!(emtm_participants -> emtm_students (student_uid));
 joinable!(emtm_students -> emtm_users (uid));
+joinable!(emtm_students -> school_zh (school_id));
 
 allow_tables_to_appear_in_same_query!(
     emtm_cows,

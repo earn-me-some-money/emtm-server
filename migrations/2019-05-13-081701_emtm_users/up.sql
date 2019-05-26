@@ -38,7 +38,9 @@ CREATE TABLE emtm_students
 ) CHARACTER SET utf8mb4;
 
 ALTER TABLE `emtm_students`
-    ADD CONSTRAINT `emtm_students_uid` FOREIGN KEY (`uid`) REFERENCES `emtm_users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ADD CONSTRAINT `student_user_exist_constra` FOREIGN KEY (`uid`) REFERENCES `emtm_users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `emtm_students`
+    ADD CONSTRAINT `school_exist_constra` FOREIGN KEY (`school_id`) REFERENCES `school_zh` (`school_id`) ON DELETE RESTRICT ON UPDATE RESTRICT ;
 COMMIT;
 
 CREATE TABLE emtm_cows
@@ -48,6 +50,6 @@ CREATE TABLE emtm_cows
 ) CHARACTER SET utf8mb4;
 
 ALTER TABLE `emtm_cows`
-    ADD CONSTRAINT `emtm_cows_uid` FOREIGN KEY (`uid`) REFERENCES `emtm_users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ADD CONSTRAINT `cow_user_exist_constra` FOREIGN KEY (`uid`) REFERENCES `emtm_users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 

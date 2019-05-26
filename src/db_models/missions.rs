@@ -1,6 +1,18 @@
 use crate::schema::*;
 use chrono::NaiveDateTime;
 
+pub mod mission_type {
+    pub const QUESTIONNAIRE: i8 = 0;
+    pub const TRANSLATION: i8 = 1;
+    pub const ERRANDS: i8 = 2;
+}
+
+pub mod part_state_type {
+    pub const STATE_ACCEPT: i8 = 0;
+    pub const STATE_FINISHED: i8 = 1;
+    pub const STATE_CANCELLED: i8 = 2;
+}
+
 #[derive(Queryable, Debug, Clone, AsChangeset, Identifiable)]
 #[primary_key(mid)]
 #[table_name = "emtm_missions"]
@@ -10,9 +22,11 @@ pub struct Mission {
     pub bounty: i32,
     pub risk: i32,
     pub name: String,
+    pub mission_type: i8,
     pub content: String,
     pub post_time: NaiveDateTime,
     pub deadline: NaiveDateTime,
+    pub max_participants: i32,
 }
 
 #[derive(Insertable, Debug, Clone)]
@@ -20,15 +34,30 @@ pub struct Mission {
 pub struct NewMission<'a> {
     pub cow_uid: i32,
     pub bounty: i32,
+    pub risk: i32,
     pub name: &'a str,
+    pub mission_type: i8,
     pub content: &'a str,
     pub post_time: NaiveDateTime,
     pub deadline: NaiveDateTime,
+    pub max_participants: i32,
 }
 
-pub const STATE_ACCEPT: u8 = 0;
-pub const STATE_FINISHED: u8 = 1;
-pub const STATE_CANCELLED: u8 = 2;
+impl<'a> NewMission<'a> {
+    pub fn from_mission(mission: &'a Mission) -> Self {
+        Self {
+            cow_uid: mission.cow_uid,
+            bounty: mission.bounty,
+            risk: mission.risk,
+            name: &mission.name,
+            mission_type: mission.mission_type,
+            content: &mission.content,
+            post_time: mission.post_time,
+            deadline: mission.deadline,
+            max_participants: mission.max_participants,
+        }
+    }
+}
 
 #[derive(Queryable, Insertable, Debug, Clone, AsChangeset, Identifiable)]
 #[primary_key(mid, student_uid)]
@@ -36,5 +65,5 @@ pub const STATE_CANCELLED: u8 = 2;
 pub struct Participant {
     pub mid: i32,
     pub student_uid: i32,
-    pub state: u8,
+    pub state: i8,
 }

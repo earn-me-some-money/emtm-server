@@ -1,7 +1,7 @@
 use crate::db_models;
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 
-#[derive(Eq, Hash, Clone)]
+#[derive(Eq, PartialEq, Hash, Clone, Debug, Copy)]
 pub enum PartState {
     Accepted,
     Finished,
@@ -10,38 +10,68 @@ pub enum PartState {
 
 impl PartState {
     /// Construct PartState from database value
-    pub fn from_val(val: u8) -> Self {
+    pub fn from_val(val: i8) -> Self {
         match val {
-            db_models::missions::STATE_ACCEPT => PartState::Accepted,
-            db_models::missions::STATE_FINISHED => PartState::Finished,
-            db_models::missions::STATE_CANCELLED => PartState::Cancelled,
+            db_models::missions::part_state_type::STATE_ACCEPT => PartState::Accepted,
+            db_models::missions::part_state_type::STATE_FINISHED => PartState::Finished,
+            db_models::missions::part_state_type::STATE_CANCELLED => PartState::Cancelled,
 
             _ => panic!("Unexpected state value"),
         }
     }
-
     /// get the database value from a PartState
-    pub fn to_val(&self) -> u8 {
+    pub fn to_val(&self) -> i8 {
         match self {
-            PartState::Accepted => db_models::missions::STATE_ACCEPT,
-            PartState::Finished => db_models::missions::STATE_FINISHED,
-            PartState::Cancelled => db_models::missions::STATE_CANCELLED,
+            PartState::Accepted => db_models::missions::part_state_type::STATE_ACCEPT,
+            PartState::Finished => db_models::missions::part_state_type::STATE_FINISHED,
+            PartState::Cancelled => db_models::missions::part_state_type::STATE_CANCELLED,
         }
     }
 }
 
+#[derive(Eq, PartialEq, Hash, Clone, Debug, Copy)]
+pub enum MissionType {
+    Questionnaire,
+    Translation,
+    Errands,
+}
+
+impl MissionType {
+    /// Construct MissionType from database value
+    pub fn from_val(val: i8) -> Self {
+        match val {
+            db_models::missions::mission_type::QUESTIONNAIRE => MissionType::Questionnaire,
+            db_models::missions::mission_type::TRANSLATION => MissionType::Translation,
+            db_models::missions::mission_type::ERRANDS => MissionType::Errands,
+            _ => panic!("Unexpected state value"),
+        }
+    }
+    /// get the database value from a MissionType
+    pub fn to_val(&self) -> i8 {
+        match self {
+            MissionType::Questionnaire => db_models::missions::mission_type::QUESTIONNAIRE,
+            MissionType::Translation => db_models::missions::mission_type::TRANSLATION,
+            MissionType::Errands => db_models::missions::mission_type::ERRANDS,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Mission {
     pub mid: i32,
     pub cow_uid: i32,
     pub bounty: i32,
     pub risk: i32,
     pub name: String,
+    pub mission_type: MissionType,
     pub content: String,
     pub post_time: NaiveDateTime,
     pub deadline: NaiveDateTime,
     pub participants: Vec<Participant>,
+    pub max_participants: i32,
 }
 
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Participant {
     pub student_uid: i32,
     pub state: PartState,
@@ -75,6 +105,7 @@ impl Mission {
             bounty: mission.bounty,
             risk: mission.risk,
             name: mission.name,
+            mission_type: MissionType::from_val(mission.mission_type),
             content: mission.content,
             post_time: mission.post_time,
             deadline: mission.deadline,
@@ -82,6 +113,7 @@ impl Mission {
                 .into_iter()
                 .map(|part| Participant::from_db(part))
                 .collect(),
+            max_participants: mission.max_participants,
         }
     }
 
@@ -98,9 +130,11 @@ impl Mission {
                 bounty: self.bounty,
                 risk: self.risk,
                 name: self.name.clone(),
+                mission_type: self.mission_type.to_val(),
                 content: self.content.clone(),
                 post_time: self.post_time,
                 deadline: self.deadline,
+                max_participants: self.max_participants,
             },
             self.participants
                 .iter()
