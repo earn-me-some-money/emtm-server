@@ -3,13 +3,13 @@ use crate::models::missions::Mission;
 use crate::search;
 use cang_jie::{CangJieTokenizer, TokenizerOption, CANG_JIE};
 use jieba_rs::Jieba;
-use std::env;
+
 use std::path::Path;
 use std::sync::Arc;
 use tantivy::collector::TopDocs;
-use tantivy::query::{QueryParser, QueryParserError};
+use tantivy::query::{QueryParser};
 use tantivy::schema::*;
-use tantivy::{DocAddress, Index, IndexWriter, TantivyError};
+use tantivy::{Index, IndexWriter, TantivyError};
 
 pub trait MissionIndex {
     /// Relatively expensive, please update in bulk
@@ -52,8 +52,8 @@ impl MissionIndex for search::Searcher {
         let name = schema.get_field("name").unwrap();
         let content = schema.get_field("content").unwrap();
         let query_parser = QueryParser::for_index(&self.mission_index, vec![name, content]);
-        let query = query_parser.parse_query(query)?;
-        let docs = searcher.search(&query, &TopDocs::with_limit(100))?;
+        let parsed_query = query_parser.parse_query(query)?;
+        let docs = searcher.search(&parsed_query, &TopDocs::with_limit(100))?;
         let mut results = vec![];
 
         for (score, doc_address) in docs {
@@ -90,6 +90,9 @@ impl MissionIndex for search::Searcher {
                 option: TokenizerOption::Unicode,
             },
         );
+        let mut writer = index.writer(100_000_000).unwrap();
+
+        Self::init_mission_data(&mut writer, &schema);
 
         index
     }
