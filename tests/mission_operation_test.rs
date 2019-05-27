@@ -38,7 +38,7 @@ fn add_update_mission_test() {
     let deadline = NaiveDateTime::new(d, t2);
     let mission = Mission {
         mid: 0,
-        cow_uid: cows[0].uid,
+        poster_uid: cows[0].uid,
         bounty: 0,
         risk: 0,
         name: "test".to_string(),
@@ -50,14 +50,14 @@ fn add_update_mission_test() {
         max_participants: 5,
     };
     ctrl.add_mission(&mission).unwrap();
-    let mission_list = ctrl.get_cow_missions(cows[0].uid);
+    let mission_list = ctrl.get_poster_missions(cows[0].uid);
     assert_eq!(mission_list[0].name, "test");
     assert_eq!(mission_list[0].content, "question");
 
     let participants = vec![];
     let new_mission = Mission {
         mid: 1,
-        cow_uid: cows[0].uid,
+        poster_uid: cows[0].uid,
         bounty: 0,
         risk: 0,
         name: "update".to_string(),
@@ -69,7 +69,7 @@ fn add_update_mission_test() {
         max_participants: 5,
     };
     ctrl.update_mission(&new_mission).unwrap();
-    let mission_list = ctrl.get_cow_missions(cows[0].uid);
+    let mission_list = ctrl.get_poster_missions(cows[0].uid);
 
     assert_eq!(mission_list[0].name, "update");
     assert_eq!(mission_list[0].content, "question updated");
@@ -144,7 +144,7 @@ fn add_update_participants_test() {
     let participants = vec![];
     let mission = Mission {
         mid: 0,
-        cow_uid: cows[0].uid,
+        poster_uid: cows[0].uid,
         bounty: 0,
         risk: 0,
         name: "test".to_string(),

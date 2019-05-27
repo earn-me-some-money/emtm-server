@@ -59,7 +59,7 @@ impl MissionType {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Mission {
     pub mid: i32,
-    pub cow_uid: i32,
+    pub poster_uid: i32,
     pub bounty: i32,
     pub risk: i32,
     pub name: String,
@@ -101,7 +101,7 @@ impl Mission {
     ) -> Self {
         Self {
             mid: mission.mid,
-            cow_uid: mission.cow_uid,
+            poster_uid: mission.poster_uid,
             bounty: mission.bounty,
             risk: mission.risk,
             name: mission.name,
@@ -126,7 +126,7 @@ impl Mission {
         (
             db_models::missions::Mission {
                 mid: self.mid,
-                cow_uid: self.cow_uid,
+                poster_uid: self.poster_uid,
                 bounty: self.bounty,
                 risk: self.risk,
                 name: self.name.clone(),

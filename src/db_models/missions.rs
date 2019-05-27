@@ -18,7 +18,7 @@ pub mod part_state_type {
 #[table_name = "emtm_missions"]
 pub struct Mission {
     pub mid: i32,
-    pub cow_uid: i32,
+    pub poster_uid: i32,
     pub bounty: i32,
     pub risk: i32,
     pub name: String,
@@ -32,7 +32,7 @@ pub struct Mission {
 #[derive(Insertable, Debug, Clone)]
 #[table_name = "emtm_missions"]
 pub struct NewMission<'a> {
-    pub cow_uid: i32,
+    pub poster_uid: i32,
     pub bounty: i32,
     pub risk: i32,
     pub name: &'a str,
@@ -46,7 +46,7 @@ pub struct NewMission<'a> {
 impl<'a> NewMission<'a> {
     pub fn from_mission(mission: &'a Mission) -> Self {
         Self {
-            cow_uid: mission.cow_uid,
+            poster_uid: mission.poster_uid,
             bounty: mission.bounty,
             risk: mission.risk,
             name: &mission.name,

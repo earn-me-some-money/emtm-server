@@ -1,9 +1,12 @@
 use diesel::prelude::*;
+use std::ops::DerefMut;
 
 use crate::controller::Controller;
 use crate::db_error::DbError;
 use crate::db_models;
 use crate::models;
+
+use crate::search::{SEARCHER, MissionIndex};
 
 pub trait MissionController {
     /// Add a mission, returns an error if failed
@@ -40,13 +43,22 @@ pub trait MissionController {
     /// # Arguments
     /// * 'mid' - the id of the mission
     fn get_mission_participants(&self, mid: i32) -> Vec<db_models::missions::Participant>;
-    /// Get all the mission posted by a cow
+    /// Get all the mission posted by a poster
     /// # Arguments
-    /// * 'cow_uid' - the id of the cow
-    fn get_cow_missions(&self, cow_uid: i32) -> Vec<models::missions::Mission>;
-    /// Get all the mission joined by a student
+    /// * 'poster_uid' - the id of the poster
+    fn get_poster_missions(&self, poster_uid: i32) -> Vec<models::missions::Mission>;
+    /// Get a particular the mission posted by a poster
     /// # Arguments
-    /// * 'student_id' - the id of the cow
+    /// * 'poster_uid' - the id of the poster
+    /// * 'name' - The name of the mission
+    fn get_posted_name_missions(
+        &self,
+        poster_uid: i32,
+        name: &str,
+    ) -> Option<models::missions::Mission>;
+    /// Get all the mission joined by a student (not posted by!)
+    /// # Arguments
+    /// * 'student_id' - the id of the student
     fn get_student_missions(&self, student_id: i32) -> Vec<models::missions::Mission>;
     /// Get all the missions in a list, participants will not be loaded to save time,
     /// use get_mission_from_mid to get the complete mission info!
@@ -69,7 +81,25 @@ impl MissionController for Controller {
             .execute(&self.connection);
 
         match result {
-            Ok(_) => Ok(()),
+            Ok(_) => {
+                let added_mission =
+                    self.get_posted_name_missions(mission.poster_uid, &mission.name);
+                match added_mission {
+                    Some(new_mission) => {
+                        let mut searcher = SEARCHER.write().unwrap();
+                        searcher.deref_mut().add_mission(&new_mission);
+                        searcher.deref_mut().commit_change();
+                        Ok(())
+                    }
+                    None => {
+                        warn!(
+                            "Failed to add mission with name {}: Unknown reason",
+                            mission.name
+                        );
+                        Err(DbError::new("unknown error"))
+                    }
+                }
+            }
             Err(error) => {
                 info!(
                     "Failed to add mission with name {}: {}",
@@ -170,11 +200,11 @@ impl MissionController for Controller {
         }
     }
 
-    fn get_cow_missions(&self, cow_uid_: i32) -> Vec<models::missions::Mission> {
+    fn get_poster_missions(&self, poster_uid_: i32) -> Vec<models::missions::Mission> {
         use crate::schema::emtm_missions::dsl::*;
         use db_models::missions::*;
         let result = emtm_missions
-            .filter(cow_uid.eq(cow_uid_))
+            .filter(poster_uid.eq(poster_uid_))
             .load::<Mission>(&self.connection);
         match result {
             Ok(missions) => {
@@ -189,7 +219,40 @@ impl MissionController for Controller {
                 mission_list
             }
             Err(e) => {
-                error!("Panic when finding mission for cow {}: {}", cow_uid_, e);
+                error!(
+                    "Panic when finding mission for poster {}: {}",
+                    poster_uid_, e
+                );
+                panic!(e.to_string());
+            }
+        }
+    }
+
+    fn get_posted_name_missions(
+        &self,
+        poster_uid_: i32,
+        name: &str,
+    ) -> Option<models::missions::Mission> {
+        use crate::schema::emtm_missions::dsl::*;
+        use db_models::missions::*;
+        let result = emtm_missions
+            .filter(poster_uid.eq(poster_uid_))
+            .load::<Mission>(&self.connection);
+        match result {
+            Ok(mut missions) => {
+                if missions.is_empty() {
+                    None
+                } else {
+                    let mission = missions.remove(0);
+                    let parts = self.get_mission_participants(mission.mid);
+                    Some(models::missions::Mission::from_db(mission, parts))
+                }
+            }
+            Err(e) => {
+                error!(
+                    "Panic when finding mission for poster {}: {}",
+                    poster_uid_, e
+                );
                 panic!(e.to_string());
             }
         }

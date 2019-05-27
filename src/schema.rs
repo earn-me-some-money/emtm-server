@@ -8,7 +8,7 @@ table! {
 table! {
     emtm_missions (mid) {
         mid -> Integer,
-        cow_uid -> Integer,
+        poster_uid -> Integer,
         bounty -> Integer,
         risk -> Integer,
         name -> Varchar,
@@ -63,7 +63,7 @@ table! {
 }
 
 joinable!(emtm_cows -> emtm_users (uid));
-joinable!(emtm_missions -> emtm_cows (cow_uid));
+joinable!(emtm_missions -> emtm_users (poster_uid));
 joinable!(emtm_participants -> emtm_missions (mid));
 joinable!(emtm_participants -> emtm_students (student_uid));
 joinable!(emtm_students -> emtm_users (uid));
