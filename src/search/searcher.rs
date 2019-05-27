@@ -10,8 +10,6 @@ use cang_jie::{CangJieTokenizer, TokenizerOption, CANG_JIE};
 use jieba_rs::Jieba;
 use std::sync::Arc;
 
-
-
 static MISSION_DIR: &str = "mission-index";
 
 pub struct Searcher {
@@ -66,10 +64,7 @@ impl Searcher {
     }
 
     pub fn rebuild(&mut self, ctrl: &Controller) {
-        std::fs::rename(&self.index_path_base, "TO_REMOVE_INDEX_TEMP").unwrap();
-        std::fs::remove_dir_all("TO_REMOVE_INDEX_TEMP").unwrap_or_else(|e| {
-            warn!("Failed to remove previous index: {}", e);
-        });
+        remove_dir_all::remove_dir_all(&self.index_path_base).unwrap();
         std::fs::create_dir(&self.index_path_base).unwrap();
         let mission_index_path = Path::new(&self.index_path_base).join(MISSION_DIR);
         std::fs::create_dir(&mission_index_path).unwrap();

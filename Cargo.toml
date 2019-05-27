@@ -16,4 +16,6 @@ cang-jie = "0.3.0"
 jieba-rs = "0.2"
 lazy_static = "1.3.0"
 rand = "0.6.5"
+remove_dir_all = "0.5.1"
+
 
