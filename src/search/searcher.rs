@@ -63,30 +63,6 @@ impl Searcher {
         self.mission_index.writer(100_000_000).unwrap()
     }
 
-    pub fn query_mission(&self, query: &str) -> Result<Vec<(i32, f32)>, TantivyError> {
-        let searcher = self.mission_index_reader.searcher();
-        let schema = self.mission_index.schema();
-        let mid = schema.get_field("mid").unwrap();
-        let name = schema.get_field("name").unwrap();
-        let content = schema.get_field("content").unwrap();
-        let query_parser = QueryParser::for_index(&self.mission_index, vec![name, content]);
-        let parsed_query = query_parser.parse_query(query)?;
-        let docs = searcher.search(&parsed_query, &TopDocs::with_limit(100))?;
-        let mut results = vec![];
-
-        for (score, doc_address) in docs {
-            let doc = searcher.doc(doc_address)?;
-            let values = doc.field_values();
-            for v in values {
-                if v.field() == mid {
-                    results.push((v.value().i64_value() as i32, score));
-                }
-            }
-        }
-
-        Ok(results)
-    }
-
     pub fn rebuild(&mut self, ctrl: &Controller) {
         std::fs::remove_dir_all(&self.index_path_base).unwrap();
         std::fs::create_dir(&self.index_path_base).unwrap();
