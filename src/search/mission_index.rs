@@ -1,12 +1,11 @@
 use crate::controller::{mission_controller::MissionController, Controller};
-use crate::models::missions::Mission;
+
 use crate::search;
 use cang_jie::{CangJieTokenizer, TokenizerOption, CANG_JIE};
 use jieba_rs::Jieba;
 
-use std::ops::DerefMut;
 use std::path::Path;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use tantivy::collector::TopDocs;
 use tantivy::query::QueryParser;
 use tantivy::schema::*;
@@ -18,9 +17,9 @@ pub trait MissionIndex {
 
     /// Init the indexes by loading all missions in database
     /// Mission name and content will be indexed
-    fn init_mission_indexes<P: AsRef<Path>>(path: &P) -> Index;
+    fn init_mission_indexes<P: AsRef<Path>>(path: &P, ctrl: &Controller) -> Index;
 
-    fn init_mission_data(writer: &mut IndexWriter, schema: &Schema);
+    fn init_mission_data(writer: &mut IndexWriter, schema: &Schema, ctrl: &Controller);
 }
 
 impl MissionIndex for search::Searcher {
@@ -48,7 +47,7 @@ impl MissionIndex for search::Searcher {
         Ok(results)
     }
 
-    fn init_mission_indexes<P: AsRef<Path>>(path: &P) -> Index {
+    fn init_mission_indexes<P: AsRef<Path>>(path: &P, ctrl: &Controller) -> Index {
         let mut builder = SchemaBuilder::default();
 
         let text_index = TextFieldIndexing::default()
@@ -71,13 +70,12 @@ impl MissionIndex for search::Searcher {
         );
         let mut writer = index.writer(100_000_000).unwrap();
 
-        Self::init_mission_data(&mut writer, &schema);
+        Self::init_mission_data(&mut writer, &schema, ctrl);
 
         index
     }
 
-    fn init_mission_data(writer: &mut IndexWriter, schema: &Schema) {
-        let ctrl = Controller::new();
+    fn init_mission_data(writer: &mut IndexWriter, schema: &Schema, ctrl: &Controller) {
         info!("Loading missions for index initialization");
         let mission_list = ctrl.get_missions_list();
         let mid = schema.get_field("mid").unwrap();

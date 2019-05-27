@@ -47,8 +47,8 @@ impl Controller {
             }
         }
         use crate::search;
-        use std::ops::DerefMut;
-        search::rebuild();
+
+        search::rebuild(self);
     }
 
     /// Revert all migrations
