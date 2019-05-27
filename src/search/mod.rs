@@ -55,6 +55,10 @@ pub fn delete_mission(mission_mid: i32) {
     writer.deref_mut().delete_term(mid_term);
 }
 
+pub fn query_mission(query: &str) -> Result<Vec<(i32, f32)>, TantivyError> {
+    SEARCHER.read().unwrap().deref().query_mission(query)
+}
+
 pub fn commit_change() -> Result<(), TantivyError> {
     let mut writer = MISSION_WRITER.lock().unwrap();
     writer.deref_mut().commit()?;

@@ -1,8 +1,8 @@
 CREATE TABLE emtm_missions
 (
     mid          INTEGER PRIMARY KEY AUTO_INCREMENT,
-    # The id of the cow who post the mission
-    cow_uid      INTEGER      NOT NULL,
+    # The id of the user who post the mission
+    poster_uid      INTEGER      NOT NULL,
     # The amount of reward per person of the mission
     bounty       INTEGER      NOT NULL,
     # The amount of tokens to be fined if
@@ -20,11 +20,12 @@ CREATE TABLE emtm_missions
     deadline     DATETIME     NOT NULL,
     # The maximum number of participants
     max_participants INTEGER NOT NULL ,
-    INDEX cow_index (cow_uid)
+    INDEX user_index (poster_uid, name),
+    UNIQUE (poster_uid, name)
 ) CHARACTER SET utf8mb4;
 
 ALTER TABLE `emtm_missions`
-    ADD CONSTRAINT `mission_cow_id_constra` FOREIGN KEY (`cow_uid`) REFERENCES `emtm_cows` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ADD CONSTRAINT `mission_cow_id_constra` FOREIGN KEY (`poster_uid`) REFERENCES `emtm_users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 CREATE TABLE emtm_participants

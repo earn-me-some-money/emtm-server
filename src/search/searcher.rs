@@ -1,13 +1,15 @@
 use std::env;
 use std::path::{Path, PathBuf};
 
-use tantivy::{Index, IndexWriter};
+use tantivy::{Index, IndexWriter, TantivyError};
 use tantivy::{IndexReader, ReloadPolicy};
 
 pub use crate::search::mission_index::*;
 use cang_jie::{CangJieTokenizer, TokenizerOption, CANG_JIE};
 use jieba_rs::Jieba;
 use std::sync::{Arc, Mutex, RwLock};
+use tantivy::query::QueryParser;
+use tantivy::collector::TopDocs;
 
 static MISSION_DIR: &str = "mission-index";
 
@@ -57,6 +59,30 @@ impl Searcher {
 
     pub fn get_writer(&self) -> IndexWriter {
         self.mission_index.writer(100_000_000).unwrap()
+    }
+
+    pub fn query_mission(&self, query: &str) -> Result<Vec<(i32, f32)>, TantivyError> {
+        let searcher = self.mission_index_reader.searcher();
+        let schema = self.mission_index.schema();
+        let mid = schema.get_field("mid").unwrap();
+        let name = schema.get_field("name").unwrap();
+        let content = schema.get_field("content").unwrap();
+        let query_parser = QueryParser::for_index(&self.mission_index, vec![name, content]);
+        let parsed_query = query_parser.parse_query(query)?;
+        let docs = searcher.search(&parsed_query, &TopDocs::with_limit(100))?;
+        let mut results = vec![];
+
+        for (score, doc_address) in docs {
+            let doc = searcher.doc(doc_address)?;
+            let values = doc.field_values();
+            for v in values {
+                if v.field() == mid {
+                    results.push((v.value().i64_value() as i32, score));
+                }
+            }
+        }
+
+        Ok(results)
     }
 
     pub fn rebuild(&mut self) {
