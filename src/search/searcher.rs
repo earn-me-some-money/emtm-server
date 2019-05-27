@@ -28,9 +28,11 @@ impl Searcher {
     pub fn new(path: &str) -> Self {
         let mission_index_path = Path::new(path).join(MISSION_DIR);
 
-        if !Path::new(path).exists() {
+        if !Path::new(path).exists() || !mission_index_path.exists() {
             info!("Index directory not exist, rebuilding indexes");
-            std::fs::create_dir(path).unwrap();
+            if !Path::new(path).exists() {
+                std::fs::create_dir(path).unwrap();
+            }
             std::fs::create_dir(&mission_index_path).unwrap();
             // init with default db controller
             Self::init_mission_indexes(&mission_index_path, &Controller::new());
