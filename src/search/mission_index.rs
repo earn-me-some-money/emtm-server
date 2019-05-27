@@ -6,23 +6,13 @@ use jieba_rs::Jieba;
 
 use std::ops::DerefMut;
 use std::path::Path;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use tantivy::collector::TopDocs;
 use tantivy::query::QueryParser;
 use tantivy::schema::*;
 use tantivy::{Index, IndexWriter, TantivyError};
 
 pub trait MissionIndex {
-    /// Add a mission to writer
-    fn add_mission(&mut self, new_missions: &Mission);
-
-    /// Delete a mission based on mid
-    fn delete_mission(&mut self, mid: i32);
-
-    /// Call this after add and delete so that the changes would be persistent
-    /// Relatively expensive call
-    fn commit_change(&mut self) -> Result<(), TantivyError>;
-
     /// Returns a list of mid, ordered by similarities and search score
     fn query_mission(&self, query: &str) -> Result<Vec<(i32, f32)>, TantivyError>;
 
@@ -34,36 +24,6 @@ pub trait MissionIndex {
 }
 
 impl MissionIndex for search::Searcher {
-    fn add_mission(&mut self, new_mission: &Mission) {
-        let schema = self.mission_index.schema();
-        let mid = schema.get_field("mid").unwrap();
-        let name = schema.get_field("name").unwrap();
-        let content = schema.get_field("content").unwrap();
-        let mut writer = self.mission_index_writer.lock().unwrap();
-        writer.deref_mut().add_document(doc!(
-            mid => new_mission.mid as i64,
-            name => new_mission.name.clone(),
-            content => new_mission.content.clone()
-        ));
-    }
-
-    fn delete_mission(&mut self, mission_mid: i32) {
-        let schema = self.mission_index.schema();
-        let mid = schema.get_field("mid").unwrap();
-        let name = schema.get_field("name").unwrap();
-        let content = schema.get_field("content").unwrap();
-
-        let mid_term = Term::from_field_i64(mid, mission_mid as i64);
-        let mut writer = self.mission_index_writer.lock().unwrap();
-        writer.deref_mut().delete_term(mid_term);
-    }
-
-    fn commit_change(&mut self) -> Result<(), TantivyError> {
-        let mut writer = self.mission_index_writer.lock().unwrap();
-        writer.deref_mut().commit()?;
-        Ok(())
-    }
-
     fn query_mission(&self, query: &str) -> Result<Vec<(i32, f32)>, TantivyError> {
         let searcher = self.mission_index_reader.searcher();
         let schema = self.mission_index.schema();

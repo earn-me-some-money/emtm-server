@@ -1,12 +1,11 @@
 use diesel::prelude::*;
-use std::ops::DerefMut;
 
 use crate::controller::Controller;
 use crate::db_error::DbError;
 use crate::db_models;
 use crate::models;
 
-use crate::search::{SEARCHER, MissionIndex};
+use crate::search;
 
 pub trait MissionController {
     /// Add a mission, returns an error if failed
@@ -86,9 +85,7 @@ impl MissionController for Controller {
                     self.get_posted_name_missions(mission.poster_uid, &mission.name);
                 match added_mission {
                     Some(new_mission) => {
-                        let mut searcher = SEARCHER.write().unwrap();
-                        searcher.deref_mut().add_mission(&new_mission);
-                        searcher.deref_mut().commit_change();
+                        search::add_mission(&new_mission);
                         Ok(())
                     }
                     None => {
@@ -118,6 +115,8 @@ impl MissionController for Controller {
 
         match update_res {
             Ok(row) => {
+                search::delete_mission(mission.mid);
+                search::add_mission(mission);
                 info!("Updated {} mission with mid {}", row, db_mission.mid);
                 Ok(())
             }
@@ -231,12 +230,13 @@ impl MissionController for Controller {
     fn get_posted_name_missions(
         &self,
         poster_uid_: i32,
-        name: &str,
+        name_: &str,
     ) -> Option<models::missions::Mission> {
         use crate::schema::emtm_missions::dsl::*;
         use db_models::missions::*;
         let result = emtm_missions
             .filter(poster_uid.eq(poster_uid_))
+            .filter(name.eq(name_))
             .load::<Mission>(&self.connection);
         match result {
             Ok(mut missions) => {

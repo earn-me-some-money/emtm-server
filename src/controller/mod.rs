@@ -46,9 +46,9 @@ impl Controller {
                 error!("Error when running migrations: {}", error);
             }
         }
-        use crate::search::SEARCHER;
+        use crate::search;
         use std::ops::DerefMut;
-        SEARCHER.write().unwrap().deref_mut().rebuild();
+        search::rebuild();
     }
 
     /// Revert all migrations

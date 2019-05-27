@@ -1,95 +1,62 @@
 use std::env;
+use std::ops::{Deref, DerefMut};
 use std::path::{Path, PathBuf};
-
-use tantivy::{Index, IndexWriter};
+use tantivy::{Index, IndexWriter, TantivyError, Term};
 use tantivy::{IndexReader, ReloadPolicy};
 
-pub mod mission_index;
+mod mission_index;
+mod searcher;
 
+use crate::controller::{mission_controller::MissionController, Controller};
+use crate::models::missions::Mission;
 pub use crate::search::mission_index::*;
+use crate::search::searcher::*;
 use cang_jie::{CangJieTokenizer, TokenizerOption, CANG_JIE};
 use jieba_rs::Jieba;
 use std::sync::{Arc, Mutex, RwLock};
 
-pub struct Searcher {
-    index_path_base: String,
-    mission_index: Index,
-    mission_index_reader: IndexReader,
-    mission_index_writer: Mutex<IndexWriter>,
-}
-
-static MISSION_DIR: &str = "mission-index";
-
 lazy_static! {
     /// Use this instance! use read() when querying and write when adding and updating
-    pub static ref SEARCHER: RwLock<Searcher> = RwLock::new(Searcher::default());
+    static ref SEARCHER: RwLock<Searcher> = RwLock::new(Searcher::default());
+    static ref MISSION_WRITER: Mutex<IndexWriter> = Mutex::new(SEARCHER.read().unwrap().get_writer());
 }
 
-impl Searcher {
-    pub fn default() -> Self {
-        Self::new(&env::var("EMTM_INDEX_DIR").unwrap_or("./emtm-indexes/".to_string()))
-    }
+pub fn rebuild() {
+    info!("Rebuilding index");
+    let mut searcher = SEARCHER.write().unwrap();
+    searcher.deref_mut().rebuild();
+    let new_writer = searcher.deref().get_writer();
+    std::mem::replace(MISSION_WRITER.lock().unwrap().deref_mut(), new_writer);
+}
 
-    pub fn new(path: &str) -> Self {
-        let mission_index_path = Path::new(path).join(MISSION_DIR);
+pub fn add_mission(new_mission: &Mission) {
+    let searcher_guard = SEARCHER.read().unwrap();
+    let searcher = searcher_guard.deref();
+    let schema = searcher.mission_index.schema();
+    let mid = schema.get_field("mid").unwrap();
+    let name = schema.get_field("name").unwrap();
+    let content = schema.get_field("content").unwrap();
+    let mut writer = MISSION_WRITER.lock().unwrap();
+    writer.deref_mut().add_document(doc!(
+        mid => new_mission.mid as i64,
+        name => new_mission.name.clone(),
+        content => new_mission.content.clone()
+    ));
+}
 
-        if !Path::new(path).exists() {
-            info!("Index directory not exist, rebuilding indexes");
-            std::fs::create_dir(path).unwrap();
-            std::fs::create_dir(&mission_index_path).unwrap();
-            Self::init_mission_indexes(&mission_index_path);
-        }
+pub fn delete_mission(mission_mid: i32) {
+    let searcher_guard = SEARCHER.read().unwrap();
+    let searcher = searcher_guard.deref();
+    let schema = searcher.mission_index.schema();
+    let mid = schema.get_field("mid").unwrap();
 
-        let mission_index = Index::open_in_dir(mission_index_path).unwrap();
+    let mid_term = Term::from_field_i64(mid, mission_mid as i64);
+    let mut writer = MISSION_WRITER.lock().unwrap();
+    writer.deref_mut().delete_term(mid_term);
+}
 
-        mission_index.tokenizers().register(
-            CANG_JIE,
-            CangJieTokenizer {
-                worker: Arc::new(Jieba::empty()),
-                option: TokenizerOption::Unicode,
-            },
-        );
-
-        let mission_index_reader = mission_index
-            .reader_builder()
-            .reload_policy(ReloadPolicy::OnCommit)
-            .try_into()
-            .unwrap();
-        let mission_index_writer = mission_index.writer(100_000_000).unwrap();
-
-        Self {
-            index_path_base: path.to_string(),
-            mission_index,
-            mission_index_reader,
-            mission_index_writer: Mutex::new(mission_index_writer),
-        }
-    }
-
-    pub fn rebuild(&mut self) {
-        info!("Rebuilding index");
-        std::fs::remove_dir_all(&self.index_path_base).unwrap();
-        std::fs::create_dir(&self.index_path_base).unwrap();
-        let mission_index_path = Path::new(&self.index_path_base).join(MISSION_DIR);
-        std::fs::create_dir(&mission_index_path).unwrap();
-        Self::init_mission_indexes(&mission_index_path);
-
-        self.mission_index = Index::open_in_dir(mission_index_path).unwrap();
-
-        self.mission_index.tokenizers().register(
-            CANG_JIE,
-            CangJieTokenizer {
-                worker: Arc::new(Jieba::empty()),
-                option: TokenizerOption::Unicode,
-            },
-        );
-
-        self.mission_index_reader = self.mission_index
-            .reader_builder()
-            .reload_policy(ReloadPolicy::OnCommit)
-            .try_into()
-            .unwrap();
-        let mission_index_writer = self.mission_index.writer(100_000_000).unwrap();
-        self.mission_index_writer = Mutex::new(mission_index_writer);
-
-    }
+pub fn commit_change() -> Result<(), TantivyError> {
+    let mut writer = MISSION_WRITER.lock().unwrap();
+    writer.deref_mut().commit()?;
+    Ok(())
 }
