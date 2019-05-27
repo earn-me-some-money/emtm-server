@@ -72,5 +72,6 @@ pub fn commit_change() -> Result<(), TantivyError> {
         *writer = Some(searcher.deref().get_writer());
     }
     writer.deref_mut().as_mut().unwrap().commit()?;
+    info!("Commit indexes change");
     Ok(())
 }

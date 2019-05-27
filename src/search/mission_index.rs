@@ -55,7 +55,7 @@ impl MissionIndex for search::Searcher {
             .set_index_option(IndexRecordOption::WithFreqsAndPositions);
         let text_options = TextOptions::default().set_indexing_options(text_index);
 
-        builder.add_i64_field("mid", STORED);
+        builder.add_i64_field("mid", INDEXED | STORED);
         builder.add_text_field("name", text_options.clone());
         builder.add_text_field("content", text_options.clone());
 

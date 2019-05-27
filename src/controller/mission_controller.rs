@@ -85,6 +85,7 @@ impl MissionController for Controller {
                     self.get_posted_name_missions(mission.poster_uid, &mission.name);
                 match added_mission {
                     Some(new_mission) => {
+                        info!("Added one mission with mid {}", new_mission.mid);
                         search::add_mission(&new_mission);
                         Ok(())
                     }

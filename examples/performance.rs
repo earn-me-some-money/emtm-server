@@ -1,18 +1,22 @@
+extern crate emtm_db;
+extern crate pretty_env_logger;
+
 use chrono::NaiveDate;
 use chrono::NaiveDateTime;
 use chrono::NaiveTime;
-use emtm_db;
 use emtm_db::controller::mission_controller::MissionController;
 use emtm_db::controller::user_controller::UserController;
 use emtm_db::controller::Controller;
 use emtm_db::models::missions::*;
 use emtm_db::models::users::*;
+use emtm_db::search;
 use rand;
 use rand::Rng;
 use std::time::SystemTime;
 
-#[test]
-fn add_mission_bench_test() {
+fn main() {
+    pretty_env_logger::try_init_timed_custom_env("EMTM_LOG").unwrap();
+
     let ctrl = Controller::test_new();
     ctrl.revert_all();
     ctrl.migrate();
@@ -61,6 +65,7 @@ fn add_mission_bench_test() {
         };
         ctrl.add_mission(&mission).unwrap();
     }
+    search::commit_change().unwrap();
     println!("Insert Time: {}ms", start.elapsed().unwrap().as_millis());
 
     let mut mission_list = ctrl.get_missions_list();
@@ -68,5 +73,6 @@ fn add_mission_bench_test() {
         mission.content = mission.content.clone() + " Updated";
         ctrl.update_mission(&mission).unwrap();
     }
-
+    search::commit_change().unwrap();
+    println!("{:?}", search::query_mission("aa"));
 }
