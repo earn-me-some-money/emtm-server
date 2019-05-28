@@ -1,21 +1,20 @@
 use chrono::NaiveDate;
 use chrono::NaiveDateTime;
 use chrono::NaiveTime;
-extern crate emtm_db;
-extern crate pretty_env_logger;
-use emtm_db::controller::Controller;
-use emtm_db::search;
-use emtm_db::models::users::*;
-use emtm_db::controller::user_controller::UserController;
+use emtm_db;
 use emtm_db::controller::mission_controller::MissionController;
+use emtm_db::controller::user_controller::UserController;
+use emtm_db::controller::Controller;
 use emtm_db::models::missions::*;
+use emtm_db::models::users::*;
+use emtm_db::search;
 
-fn main() {
-    pretty_env_logger::try_init_timed_custom_env("EMTM_LOG").unwrap();
+#[test]
+fn search_test(){
+    let ctrl = Controller::test_new();
 
-    let _ctrl = Controller::test_new();
-    _ctrl.revert_all();
-    _ctrl.migrate();
+    ctrl.revert_all();
+    ctrl.migrate();
     let mut cows = vec![Cow {
         uid: 0,
         wechat_id: "cow1".to_string(),
@@ -28,7 +27,7 @@ fn main() {
         company: "sun".to_string(),
     }];
 
-    let mut add_cow_res = _ctrl.add_cows(&cows);
+    let mut add_cow_res = ctrl.add_cows(&cows);
     cows[0].uid = add_cow_res.remove(0).unwrap();
 
     let participants = vec![];
@@ -51,25 +50,9 @@ fn main() {
         participants: participants,
         max_participants: 5,
     };
-    let participants = vec![];
-    let mission2 = Mission {
-        mid: 0,
-        poster_uid: cows[0].uid,
-        bounty: 0,
-        risk: 0,
-        name: "testing".to_string(),
-        mission_type: MissionType::Questionnaire,
-        content: "query".to_string(),
-        post_time: post_time,
-        deadline: deadline,
-        participants: participants,
-        max_participants: 5,
-    };
-    _ctrl.add_mission(&mission).unwrap();
-    _ctrl.add_mission(&mission2).unwrap();
-    search::commit_change().unwrap();
+    ctrl.add_mission(&mission).unwrap();
+    search::commit_change();
     
     let res = search::query_mission("test").unwrap();
-
-    println!("{:?}", res);
+    assert_eq!(res[0].0, 1);
 }

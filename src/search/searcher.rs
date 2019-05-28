@@ -15,7 +15,7 @@ static MISSION_DIR: &str = "mission-index";
 pub struct Searcher {
     pub index_path_base: String,
     pub mission_index: Index,
-    pub mission_index_reader: IndexReader,
+    pub mission_index_reader: Option<IndexReader>,
 }
 
 impl Searcher {
@@ -46,11 +46,11 @@ impl Searcher {
             },
         );
 
-        let mission_index_reader = mission_index
+        let mission_index_reader = Some(mission_index
             .reader_builder()
             .reload_policy(ReloadPolicy::OnCommit)
             .try_into()
-            .unwrap();
+            .unwrap());
 
         Self {
             index_path_base: path.to_string(),
@@ -64,6 +64,7 @@ impl Searcher {
     }
 
     pub fn rebuild(&mut self, ctrl: &Controller) {
+        self.mission_index_reader = None;
         remove_dir_all::remove_dir_all(&self.index_path_base).unwrap();
         std::fs::create_dir(&self.index_path_base).unwrap();
         let mission_index_path = Path::new(&self.index_path_base).join(MISSION_DIR);
@@ -80,11 +81,11 @@ impl Searcher {
             },
         );
 
-        self.mission_index_reader = self
+        self.mission_index_reader = Some(self
             .mission_index
             .reader_builder()
             .reload_policy(ReloadPolicy::OnCommit)
             .try_into()
-            .unwrap();
+            .unwrap());
     }
 }
