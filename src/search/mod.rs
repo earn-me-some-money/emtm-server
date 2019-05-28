@@ -20,11 +20,12 @@ lazy_static! {
 
 pub fn rebuild(ctrl: &Controller) {
     info!("Rebuilding index");
+    let mut writer_guard = MISSION_WRITER.lock().unwrap();
+    *writer_guard = None;
     let mut searcher = SEARCHER.write().unwrap();
     searcher.deref_mut().rebuild(ctrl);
     let new_writer = searcher.deref().get_writer();
     drop(searcher);
-    let mut writer_guard = MISSION_WRITER.lock().unwrap();
     *writer_guard = Some(new_writer);
 }
 

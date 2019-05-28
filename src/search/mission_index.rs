@@ -24,7 +24,7 @@ pub trait MissionIndex {
 
 impl MissionIndex for search::Searcher {
     fn query_mission(&self, query: &str) -> Result<Vec<(i32, f32)>, TantivyError> {
-        let searcher = self.mission_index_reader.searcher();
+        let searcher = self.mission_index_reader.as_ref().unwrap().searcher();
         let schema = self.mission_index.schema();
         let mid = schema.get_field("mid").unwrap();
         let name = schema.get_field("name").unwrap();
