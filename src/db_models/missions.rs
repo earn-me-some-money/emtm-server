@@ -66,7 +66,7 @@ impl<'a> NewMission<'a> {
             min_grade: mission.min_grade,
             max_grade: mission.max_grade,
             school: mission.school,
-            min_finished: mission.min_finished
+            min_finished: mission.min_finished,
         }
     }
 }

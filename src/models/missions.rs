@@ -122,7 +122,7 @@ impl Mission {
             min_grade: mission.min_grade,
             max_grade: mission.max_grade,
             school: mission.school,
-            min_finished: mission.min_finished
+            min_finished: mission.min_finished,
         }
     }
 
@@ -147,7 +147,7 @@ impl Mission {
                 min_grade: self.min_grade,
                 max_grade: self.max_grade,
                 school: self.school,
-                min_finished: self.min_finished
+                min_finished: self.min_finished,
             },
             self.participants
                 .iter()

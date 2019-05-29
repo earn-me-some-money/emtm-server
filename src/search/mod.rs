@@ -30,6 +30,7 @@ pub fn rebuild(ctrl: &Controller) {
 }
 
 pub fn add_mission(new_mission: &Mission) {
+    info!("Adding mid {} to index", new_mission.mid);
     let searcher_guard = SEARCHER.read().unwrap();
     let searcher = searcher_guard.deref();
     let schema = searcher.mission_index.schema();
@@ -48,6 +49,7 @@ pub fn add_mission(new_mission: &Mission) {
 }
 
 pub fn delete_mission(mission_mid: i32) {
+    info!("Deleting mid {} from index", mission_mid);
     let searcher_guard = SEARCHER.read().unwrap();
     let searcher = searcher_guard.deref();
     let schema = searcher.mission_index.schema();

@@ -45,27 +45,28 @@ fn main() {
     let deadline = NaiveDateTime::new(d, t2);
     let mut rng = rand::thread_rng();
     let start = SystemTime::now();
-    for _i in 0..10000 {
+    for _i in 0..1000 {
+        let title: String = (0..20)
+            .map(|_| (0x20u8 + (rand::random::<f32>() * 96.0) as u8) as char)
+            .collect();
         let mission = Mission {
             mid: 0,
             poster_uid: cows[0].uid,
             bounty: rng.gen_range(0, 100),
             risk: rng.gen_range(0, 200),
-            name: (0..20)
-                .map(|_| (0x20u8 + (rand::random::<f32>() * 96.0) as u8) as char)
-                .collect(),
+            name: "北京大学".to_string() + &title,
             mission_type: MissionType::Questionnaire,
             content: (0..500)
                 .map(|_| (0x20u8 + (rand::random::<f32>() * 96.0) as u8) as char)
                 .collect(),
             post_time,
             deadline,
-            participants:participants.clone(),
+            participants: participants.clone(),
             max_participants: 5,
             min_grade: None,
             max_grade: Some(rng.gen_range(0, 10)),
             school: None,
-            min_finished: Some(rng.gen_range(0, 1000000))
+            min_finished: Some(rng.gen_range(0, 1000000)),
         };
         ctrl.add_mission(&mission).unwrap();
     }
@@ -78,5 +79,7 @@ fn main() {
         ctrl.update_mission(&mission).unwrap();
     }
     search::commit_change().unwrap();
+
     println!("{:?}", search::query_mission("aa"));
+    println!("{:?}", search::query_mission("大学"));
 }

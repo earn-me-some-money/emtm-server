@@ -10,8 +10,9 @@ use emtm_db::models::users::*;
 use emtm_db::search;
 
 #[test]
-fn search_test(){
+fn search_test() {
     let ctrl = Controller::test_new();
+    pretty_env_logger::try_init_timed_custom_env("EMTM_LOG").unwrap();
 
     ctrl.revert_all();
     ctrl.migrate();
@@ -42,21 +43,28 @@ fn search_test(){
         poster_uid: cows[0].uid,
         bounty: 0,
         risk: 0,
-        name: "test".to_string(),
+        name: "test 北京大学 {}".to_string(),
         mission_type: MissionType::Questionnaire,
         content: "question".to_string(),
         post_time: post_time,
         deadline: deadline,
-        participants: participants,
+        participants: participants.clone(),
         max_participants: 5,
         min_grade: None,
         max_grade: None,
         school: None,
-        min_finished: None
+        min_finished: None,
     };
     ctrl.add_mission(&mission).unwrap();
-    search::commit_change();
-    
+
+    search::commit_change().unwrap();
+
+    std::thread::sleep(std::time::Duration::from_millis(100));
+
     let res = search::query_mission("test").unwrap();
-    assert_eq!(res[0].0, 1);
+    assert_eq!(res.is_empty(), false);
+    let res = search::query_mission("大学").unwrap();
+    assert_eq!(res.is_empty(), false);
+    let res = search::query_mission("ques").unwrap();
+    assert_eq!(res.is_empty(), false);
 }

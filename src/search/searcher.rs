@@ -46,11 +46,13 @@ impl Searcher {
             },
         );
 
-        let mission_index_reader = Some(mission_index
-            .reader_builder()
-            .reload_policy(ReloadPolicy::OnCommit)
-            .try_into()
-            .unwrap());
+        let mission_index_reader = Some(
+            mission_index
+                .reader_builder()
+                .reload_policy(ReloadPolicy::OnCommit)
+                .try_into()
+                .unwrap(),
+        );
 
         Self {
             index_path_base: path.to_string(),
@@ -81,11 +83,12 @@ impl Searcher {
             },
         );
 
-        self.mission_index_reader = Some(self
-            .mission_index
-            .reader_builder()
-            .reload_policy(ReloadPolicy::OnCommit)
-            .try_into()
-            .unwrap());
+        self.mission_index_reader = Some(
+            self.mission_index
+                .reader_builder()
+                .reload_policy(ReloadPolicy::OnCommit)
+                .try_into()
+                .unwrap(),
+        );
     }
 }

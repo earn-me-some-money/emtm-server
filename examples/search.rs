@@ -3,12 +3,12 @@ use chrono::NaiveDateTime;
 use chrono::NaiveTime;
 extern crate emtm_db;
 extern crate pretty_env_logger;
-use emtm_db::controller::Controller;
-use emtm_db::search;
-use emtm_db::models::users::*;
-use emtm_db::controller::user_controller::UserController;
 use emtm_db::controller::mission_controller::MissionController;
+use emtm_db::controller::user_controller::UserController;
+use emtm_db::controller::Controller;
 use emtm_db::models::missions::*;
+use emtm_db::models::users::*;
+use emtm_db::search;
 
 fn main() {
     pretty_env_logger::try_init_timed_custom_env("EMTM_LOG").unwrap();
@@ -53,7 +53,7 @@ fn main() {
         min_grade: None,
         max_grade: None,
         school: None,
-        min_finished: None
+        min_finished: None,
     };
     let participants = vec![];
     let mission2 = Mission {
@@ -71,12 +71,12 @@ fn main() {
         min_grade: None,
         max_grade: None,
         school: None,
-        min_finished: None
+        min_finished: None,
     };
     _ctrl.add_mission(&mission).unwrap();
     _ctrl.add_mission(&mission2).unwrap();
     search::commit_change().unwrap();
-    
+
     let res = search::query_mission("test").unwrap();
 
     println!("{:?}", res);
