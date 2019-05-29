@@ -27,6 +27,10 @@ pub struct Mission {
     pub post_time: NaiveDateTime,
     pub deadline: NaiveDateTime,
     pub max_participants: i32,
+    pub min_grade: Option<i32>,
+    pub max_grade: Option<i32>,
+    pub school: Option<i32>,
+    pub min_finished: Option<i32>,
 }
 
 #[derive(Insertable, Debug, Clone)]
@@ -41,6 +45,10 @@ pub struct NewMission<'a> {
     pub post_time: NaiveDateTime,
     pub deadline: NaiveDateTime,
     pub max_participants: i32,
+    pub min_grade: Option<i32>,
+    pub max_grade: Option<i32>,
+    pub school: Option<i32>,
+    pub min_finished: Option<i32>,
 }
 
 impl<'a> NewMission<'a> {
@@ -55,6 +63,10 @@ impl<'a> NewMission<'a> {
             post_time: mission.post_time,
             deadline: mission.deadline,
             max_participants: mission.max_participants,
+            min_grade: mission.min_grade,
+            max_grade: mission.max_grade,
+            school: mission.school,
+            min_finished: mission.min_finished
         }
     }
 }

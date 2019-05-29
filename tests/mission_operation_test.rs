@@ -48,6 +48,10 @@ fn add_update_mission_test() {
         deadline: deadline,
         participants: participants,
         max_participants: 5,
+        min_grade: None,
+        max_grade: None,
+        school: None,
+        min_finished: None
     };
     ctrl.add_mission(&mission).unwrap();
     let mission_list = ctrl.get_poster_missions(cows[0].uid);
@@ -67,6 +71,10 @@ fn add_update_mission_test() {
         deadline: deadline,
         participants: participants,
         max_participants: 5,
+        min_grade: None,
+        max_grade: None,
+        school: None,
+        min_finished: None
     };
     ctrl.update_mission(&new_mission).unwrap();
     let mission_list = ctrl.get_poster_missions(cows[0].uid);
@@ -154,6 +162,10 @@ fn add_update_participants_test() {
         deadline: deadline,
         participants: participants,
         max_participants: 5,
+        min_grade: None,
+        max_grade: None,
+        school: None,
+        min_finished: None
     };
     ctrl.add_mission(&mission).unwrap();
 

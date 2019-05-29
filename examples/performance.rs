@@ -62,6 +62,10 @@ fn main() {
             deadline,
             participants:participants.clone(),
             max_participants: 5,
+            min_grade: None,
+            max_grade: Some(rng.gen_range(0, 10)),
+            school: None,
+            min_finished: Some(rng.gen_range(0, 1000000))
         };
         ctrl.add_mission(&mission).unwrap();
     }

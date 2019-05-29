@@ -69,6 +69,11 @@ pub struct Mission {
     pub deadline: NaiveDateTime,
     pub participants: Vec<Participant>,
     pub max_participants: i32,
+    //Grade restriction: [min, max]
+    pub min_grade: Option<i32>,
+    pub max_grade: Option<i32>,
+    pub school: Option<i32>,
+    pub min_finished: Option<i32>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -114,6 +119,10 @@ impl Mission {
                 .map(|part| Participant::from_db(part))
                 .collect(),
             max_participants: mission.max_participants,
+            min_grade: mission.min_grade,
+            max_grade: mission.max_grade,
+            school: mission.school,
+            min_finished: mission.min_finished
         }
     }
 
@@ -135,6 +144,10 @@ impl Mission {
                 post_time: self.post_time,
                 deadline: self.deadline,
                 max_participants: self.max_participants,
+                min_grade: self.min_grade,
+                max_grade: self.max_grade,
+                school: self.school,
+                min_finished: self.min_finished
             },
             self.participants
                 .iter()

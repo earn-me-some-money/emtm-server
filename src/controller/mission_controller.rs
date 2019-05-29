@@ -15,7 +15,7 @@ pub trait MissionController {
     /// Given a mission, update it using the mid field
     /// all fields other than mid and participants will be updated, make sure you only change those
     /// fields that need to be updated
-    /// To update paricipants, use add_participants and update_participant
+    /// To update participants, use add_participants and update_participant
     /// # Arguments
     /// * 'mission' - a mission, the mid field will be used to find the mission to be updated
     fn update_mission(&self, mission: &models::missions::Mission) -> Result<(), DbError>;
@@ -27,7 +27,7 @@ pub trait MissionController {
     fn add_participants(
         &self,
         mid: i32,
-        part: &Vec<models::missions::Participant>,
+        part: &[models::missions::Participant],
     ) -> Result<(), DbError>;
     /// Update the state of a participant
     /// the mid and student_uid will be used to find the record
@@ -134,7 +134,7 @@ impl MissionController for Controller {
     fn add_participants(
         &self,
         mid: i32,
-        part: &Vec<models::missions::Participant>,
+        part: &[models::missions::Participant],
     ) -> Result<(), DbError> {
         use crate::schema::emtm_participants;
         use db_models::missions::Participant;

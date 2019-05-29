@@ -17,6 +17,10 @@ table! {
         post_time -> Datetime,
         deadline -> Datetime,
         max_participants -> Integer,
+        min_grade -> Nullable<Integer>,
+        max_grade -> Nullable<Integer>,
+        school -> Nullable<Integer>,
+        min_finished -> Nullable<Integer>,
     }
 }
 
@@ -64,6 +68,7 @@ table! {
 
 joinable!(emtm_cows -> emtm_users (uid));
 joinable!(emtm_missions -> emtm_users (poster_uid));
+joinable!(emtm_missions -> school_zh (school));
 joinable!(emtm_participants -> emtm_missions (mid));
 joinable!(emtm_participants -> emtm_students (student_uid));
 joinable!(emtm_students -> emtm_users (uid));

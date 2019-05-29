@@ -50,6 +50,10 @@ fn main() {
         deadline: deadline,
         participants: participants,
         max_participants: 5,
+        min_grade: None,
+        max_grade: None,
+        school: None,
+        min_finished: None
     };
     let participants = vec![];
     let mission2 = Mission {
@@ -64,6 +68,10 @@ fn main() {
         deadline: deadline,
         participants: participants,
         max_participants: 5,
+        min_grade: None,
+        max_grade: None,
+        school: None,
+        min_finished: None
     };
     _ctrl.add_mission(&mission).unwrap();
     _ctrl.add_mission(&mission2).unwrap();

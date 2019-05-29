@@ -49,6 +49,10 @@ fn search_test(){
         deadline: deadline,
         participants: participants,
         max_participants: 5,
+        min_grade: None,
+        max_grade: None,
+        school: None,
+        min_finished: None
     };
     ctrl.add_mission(&mission).unwrap();
     search::commit_change();
