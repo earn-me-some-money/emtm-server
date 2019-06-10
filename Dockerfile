@@ -1,4 +1,4 @@
-FROM rust:1.34.1
+FROM rust:1.35
 
 WORKDIR /usr/src/emtm
 COPY . .
