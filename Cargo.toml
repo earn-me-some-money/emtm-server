@@ -1,7 +1,8 @@
 [workspace]
 members = [
     "emtm-db",
-    "emtm-web"
+    "emtm-web",
+    "emtm-verify"
 ]
 [patch.'https://github.com/earn-me-some-money/emtm-db.git']
 emtm_db = { path = "emtm-db" }

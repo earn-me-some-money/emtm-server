@@ -4,3 +4,6 @@
 [submodule "emtm-web"]
 	path = emtm-web
 	url = https://github.com/earn-me-some-money/emtm-web.git
+[submodule "emtm-verify"]
+	path = emtm-verify
+	url = https://github.com/earn-me-some-money/emtm-verify.git

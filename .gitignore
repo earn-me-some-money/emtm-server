@@ -3,6 +3,9 @@
 Cargo.lock
 
 .DS_Store
-
+.env
 .vscode
+.ideacard
 .idea
+card
+
