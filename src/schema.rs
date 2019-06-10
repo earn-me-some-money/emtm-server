@@ -18,7 +18,6 @@ table! {
     emtm_express (e_id) {
         mid -> Integer,
         e_id -> Integer,
-        is_accept -> Bool,
         e_address -> Varchar,
         e_phone_number -> Varchar,
         e_pick_number -> Varchar,
@@ -87,7 +86,6 @@ table! {
     emtm_transaction (t_id) {
         mid -> Integer,
         t_id -> Integer,
-        is_accept -> Bool,
         t_type -> Varchar,
         t_info -> Varchar,
         t_loss -> Integer,
