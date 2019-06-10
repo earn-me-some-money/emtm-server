@@ -1,0 +1,25 @@
+version: '3'
+services:
+  emtm-web:
+    build: .
+    ports:
+    - "9876:8088"
+    links:
+    - emtm-mysql
+  emtm-mysql:
+    image: mysql:5.7
+    ports: 
+      - "9877:3306"
+    environment:
+      MYSQL_DATABASE: 'EMTM'
+      MYSQL_USER: 'emtm'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'EMTM_PASSWORD'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'ROOT_PASSWORD'
+    expose:
+      - '3306'
+    volumes:
+      - emtm-db:/var/lib/mysql
+volumes:
+  emtm-db:
