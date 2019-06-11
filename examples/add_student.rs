@@ -10,7 +10,7 @@ use emtm_db::models::users::*;
 fn main() {
     pretty_env_logger::try_init_timed_custom_env("EMTM_LOG").unwrap();
 
-    let ctrl = Controller::new();
+    let ctrl = Controller::test_new();
 
     let students = vec![
         Student {

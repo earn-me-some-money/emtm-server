@@ -1,4 +1,3 @@
-use std::env;
 use std::path::Path;
 
 use tantivy::{Index, IndexWriter};
@@ -20,12 +19,11 @@ pub struct Searcher {
 
 impl Searcher {
     pub fn default() -> Self {
-        Self::new(&env::var("EMTM_INDEX_DIR").unwrap_or("./emtm-indexes/".to_string()))
+        Self::new(&dotenv::var("EMTM_INDEX_DIR").unwrap_or("./emtm-indexes/".to_string()))
     }
 
     pub fn new(path: &str) -> Self {
         let mission_index_path = Path::new(path).join(MISSION_DIR);
-
         if !Path::new(path).exists() || !mission_index_path.exists() {
             info!("Index directory not exist, rebuilding indexes");
             if !Path::new(path).exists() {

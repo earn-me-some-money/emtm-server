@@ -16,7 +16,29 @@ lazy_static! {
     /// Use this instance! use read() when querying and write when adding and updating
     static ref SEARCHER: RwLock<Searcher> = RwLock::new(Searcher::default());
     static ref MISSION_WRITER: Mutex<Option<IndexWriter>> = Mutex::new(None);
+    static ref DIRTY: Mutex<bool> = Mutex::new(true);
 }
+
+
+pub fn init() {
+    std::thread::spawn(move || {
+        // Periodic update
+        loop {
+            let mut dirty_guard = DIRTY.lock().unwrap();
+            let dirty = dirty_guard.deref_mut();
+            if *dirty {
+                info!("Commit indexes change");
+                commit_change().unwrap_or_else(|_| {
+                    warn!("Fail to update change");
+                });
+                *dirty = false;
+            }
+            drop(dirty_guard);
+            std::thread::sleep(std::time::Duration::from_secs(5));
+        }
+    });
+}
+
 
 pub fn rebuild(ctrl: &Controller) {
     info!("Rebuilding index");
@@ -46,6 +68,7 @@ pub fn add_mission(new_mission: &Mission) {
         name => new_mission.name.clone(),
         content => new_mission.content.clone()
     ));
+    *(DIRTY.lock().unwrap().deref_mut()) = true;
 }
 
 pub fn delete_mission(mission_mid: i32) {
@@ -61,6 +84,7 @@ pub fn delete_mission(mission_mid: i32) {
         *writer = Some(searcher.deref().get_writer());
     }
     writer.deref_mut().as_mut().unwrap().delete_term(mid_term);
+    *(DIRTY.lock().unwrap().deref_mut()) = true;
 }
 
 pub fn query_mission(query: &str) -> Result<Vec<(i32, f32)>, TantivyError> {
@@ -75,6 +99,6 @@ pub fn commit_change() -> Result<(), TantivyError> {
         *writer = Some(searcher.deref().get_writer());
     }
     writer.deref_mut().as_mut().unwrap().commit()?;
-    info!("Commit indexes change");
+
     Ok(())
 }
