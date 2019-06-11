@@ -13,13 +13,11 @@ RUN ls -la $HOME/.cargo;
 RUN cargo update
 RUN cargo build --release
 
-CMD ["./target/release/emtm-web"]
-
-FROM alpine:3.7
+FROM alpine:3.9
 RUN apk add --no-cache mysql-client
 # copy the build artifact from the build stage
 COPY --from=build /usr/src/emtm/target/release/emtm-web .
 
 # set the startup command to run your binary
-CMD ["./emtm-web"]
+ENTRYPOINT ["./emtm-web"]
 
