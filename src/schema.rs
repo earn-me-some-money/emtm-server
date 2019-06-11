@@ -15,7 +15,7 @@ table! {
 }
 
 table! {
-    emtm_express (e_id) {
+    emtm_errands (e_id) {
         mid -> Integer,
         e_id -> Integer,
         e_address -> Varchar,
@@ -116,7 +116,7 @@ table! {
 joinable!(emtm_answer -> emtm_students (user_id));
 joinable!(emtm_answer -> emtm_survey (qn_id));
 joinable!(emtm_cows -> emtm_users (uid));
-joinable!(emtm_express -> emtm_missions (mid));
+joinable!(emtm_errands -> emtm_missions (mid));
 joinable!(emtm_missions -> emtm_users (poster_uid));
 joinable!(emtm_missions -> school_zh (school));
 joinable!(emtm_participants -> emtm_missions (mid));
@@ -130,7 +130,7 @@ joinable!(emtm_transaction -> emtm_missions (mid));
 allow_tables_to_appear_in_same_query!(
     emtm_answer,
     emtm_cows,
-    emtm_express,
+    emtm_errands,
     emtm_missions,
     emtm_participants,
     emtm_question,

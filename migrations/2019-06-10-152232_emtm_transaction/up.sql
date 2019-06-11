@@ -12,7 +12,7 @@ ALTER TABLE `emtm_transaction`
     ADD CONSTRAINT `transaction_mission_id_contra` FOREIGN KEY (`mid`) REFERENCES `emtm_missions` (`mid`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
-CREATE TABLE emtm_express
+CREATE TABLE emtm_errands
 (
     mid                 INTEGER NOT NULL,
     e_id                INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -23,6 +23,6 @@ CREATE TABLE emtm_express
 
 ) CHARACTER SET utf8mb4;
 
-ALTER TABLE `emtm_express`
+ALTER TABLE `emtm_errands`
     ADD CONSTRAINT `express_mission_id_contra` FOREIGN KEY (`mid`) REFERENCES `emtm_missions` (`mid`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
