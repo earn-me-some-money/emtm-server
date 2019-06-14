@@ -19,7 +19,6 @@ lazy_static! {
     static ref DIRTY: Mutex<bool> = Mutex::new(true);
 }
 
-
 pub fn init() {
     std::thread::spawn(move || {
         // Periodic update
@@ -38,7 +37,6 @@ pub fn init() {
         }
     });
 }
-
 
 pub fn rebuild(ctrl: &Controller) {
     info!("Rebuilding index");

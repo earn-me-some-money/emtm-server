@@ -30,7 +30,7 @@ CREATE TABLE emtm_students
     # Number of finished jobs
     finished   INTEGER     NOT NULL DEFAULT 0,
     # The code of the student's major
-    major      VARCHAR(20) NOT NULL,
+    major      VARCHAR(50) NOT NULL,
     # Number of years the student has been in the university
     year       INTEGER     NOT NULL,
     UNIQUE (school_id, student_id),

@@ -26,11 +26,13 @@ pub struct Mission {
     pub content: String,
     pub post_time: NaiveDateTime,
     pub deadline: NaiveDateTime,
-    pub max_participants: i32,
+    pub max_participants: Option<i32>,
     pub min_grade: Option<i32>,
     pub max_grade: Option<i32>,
     pub school: Option<i32>,
     pub min_finished: Option<i32>,
+    pub min_credit: Option<i32>,
+    pub major: Option<String>,
 }
 
 #[derive(Insertable, Debug, Clone)]
@@ -44,11 +46,13 @@ pub struct NewMission<'a> {
     pub content: &'a str,
     pub post_time: NaiveDateTime,
     pub deadline: NaiveDateTime,
-    pub max_participants: i32,
+    pub max_participants: Option<i32>,
     pub min_grade: Option<i32>,
     pub max_grade: Option<i32>,
     pub school: Option<i32>,
     pub min_finished: Option<i32>,
+    pub min_credit: Option<i32>,
+    pub major: Option<&'a str>,
 }
 
 impl<'a> NewMission<'a> {
@@ -67,6 +71,8 @@ impl<'a> NewMission<'a> {
             max_grade: mission.max_grade,
             school: mission.school,
             min_finished: mission.min_finished,
+            min_credit: mission.min_credit,
+            major: mission.major.as_ref().map(String::as_str),
         }
     }
 }

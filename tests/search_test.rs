@@ -49,11 +49,13 @@ fn search_test() {
         post_time: post_time,
         deadline: deadline,
         participants: participants.clone(),
-        max_participants: 5,
+        max_participants: Some(5),
         min_grade: None,
         max_grade: None,
         school: None,
         min_finished: None,
+        min_credit: None,
+        major: None,
     };
     ctrl.add_mission(&mission).unwrap();
 

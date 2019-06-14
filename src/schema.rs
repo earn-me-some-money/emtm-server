@@ -36,11 +36,13 @@ table! {
         content -> Text,
         post_time -> Datetime,
         deadline -> Datetime,
-        max_participants -> Integer,
+        max_participants -> Nullable<Integer>,
         min_grade -> Nullable<Integer>,
         max_grade -> Nullable<Integer>,
         school -> Nullable<Integer>,
         min_finished -> Nullable<Integer>,
+        min_credit -> Nullable<Integer>,
+        major -> Nullable<Varchar>,
     }
 }
 

@@ -68,12 +68,13 @@ pub struct Mission {
     pub post_time: NaiveDateTime,
     pub deadline: NaiveDateTime,
     pub participants: Vec<Participant>,
-    pub max_participants: i32,
-    //Grade restriction: [min, max]
+    pub max_participants: Option<i32>,
     pub min_grade: Option<i32>,
     pub max_grade: Option<i32>,
     pub school: Option<i32>,
     pub min_finished: Option<i32>,
+    pub min_credit: Option<i32>,
+    pub major: Option<String>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -123,6 +124,8 @@ impl Mission {
             max_grade: mission.max_grade,
             school: mission.school,
             min_finished: mission.min_finished,
+            min_credit: mission.min_credit,
+            major: mission.major,
         }
     }
 
@@ -148,6 +151,8 @@ impl Mission {
                 max_grade: self.max_grade,
                 school: self.school,
                 min_finished: self.min_finished,
+                min_credit: self.min_credit,
+                major: self.major.clone(),
             },
             self.participants
                 .iter()

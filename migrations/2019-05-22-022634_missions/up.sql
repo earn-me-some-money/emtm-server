@@ -19,17 +19,21 @@ CREATE TABLE emtm_missions
     # The time when the mission is due
     deadline         DATETIME     NOT NULL,
     # The maximum number of participants
-    max_participants INTEGER      NOT NULL,
+    max_participants INTEGER     DEFAULT NULL,
     # The following restriction on participants are optional
     # The minimum grade of the participants
-    min_grade        INTEGER DEFAULT NULL,
+    min_grade        INTEGER     DEFAULT NULL,
     # The maximum grade of the participants
-    max_grade        INTEGER DEFAULT NULL,
+    max_grade        INTEGER     DEFAULT NULL,
     # The school the participant must come from,
     # set to null if no school restriction
-    school           INTEGER DEFAULT NULL,
+    school           INTEGER     DEFAULT NULL,
     # The minimum number of missions the student must have finished
-    min_finished     INTEGER DEFAULT NULL,
+    min_finished     INTEGER     DEFAULT NULL,
+    # The default credit tokens the participants must have
+    min_credit       INTEGER     DEFAULT NULL,
+    # The major of the participating student
+    major            VARCHAR(50) DEFAULT NULL,
     INDEX user_index (poster_uid, name),
     UNIQUE (poster_uid, name)
 ) CHARACTER SET utf8mb4;
