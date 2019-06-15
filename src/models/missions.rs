@@ -34,6 +34,7 @@ pub enum MissionType {
     Questionnaire,
     Translation,
     Errands,
+    Trade,
 }
 
 impl MissionType {
@@ -43,7 +44,8 @@ impl MissionType {
             db_models::missions::mission_type::QUESTIONNAIRE => MissionType::Questionnaire,
             db_models::missions::mission_type::TRANSLATION => MissionType::Translation,
             db_models::missions::mission_type::ERRANDS => MissionType::Errands,
-            _ => panic!("Unexpected state value"),
+            db_models::missions::mission_type::TRADE => MissionType::Trade,
+            _ => panic!("Unexpected mission type value"),
         }
     }
     /// get the database value from a MissionType
@@ -52,6 +54,7 @@ impl MissionType {
             MissionType::Questionnaire => db_models::missions::mission_type::QUESTIONNAIRE,
             MissionType::Translation => db_models::missions::mission_type::TRANSLATION,
             MissionType::Errands => db_models::missions::mission_type::ERRANDS,
+            MissionType::Trade => db_models::missions::mission_type::TRADE,
         }
     }
 }

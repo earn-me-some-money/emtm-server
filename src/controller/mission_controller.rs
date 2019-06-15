@@ -11,7 +11,7 @@ pub trait MissionController {
     /// Add a mission, returns an error if failed
     /// # Arguments
     /// * 'mission' - a mission, the mid field and participant field will be ignored
-    fn add_mission(&self, mission: &models::missions::Mission) -> Result<(), DbError>;
+    fn add_mission(&self, mission: &models::missions::Mission) -> Result<i32, DbError>;
     /// Given a mission, update it using the mid field
     /// all fields other than mid and participants will be updated, make sure you only change those
     /// fields that need to be updated
@@ -66,10 +66,17 @@ pub trait MissionController {
     /// # Arguments
     /// * 'mid' - the id of the mission
     fn get_mission_from_mid(&self, mid: i32) -> Option<models::missions::Mission>;
+    /// Get a list of missions of the given type
+    /// # Arguments
+    /// * 'mission_type' - the type of missions to query
+    fn get_typed_mission_list(
+        &self,
+        mission_type: models::missions::MissionType,
+    ) -> Vec<models::missions::Mission>;
 }
 
 impl MissionController for Controller {
-    fn add_mission(&self, mission: &models::missions::Mission) -> Result<(), DbError> {
+    fn add_mission(&self, mission: &models::missions::Mission) -> Result<i32, DbError> {
         use crate::schema::emtm_missions;
         use db_models::missions::*;
         let db_mission = mission.to_db().0;
@@ -87,7 +94,7 @@ impl MissionController for Controller {
                     Some(new_mission) => {
                         info!("Added one mission with mid {}", new_mission.mid);
                         search::add_mission(&new_mission);
-                        Ok(())
+                        Ok(new_mission.mid)
                     }
                     None => {
                         warn!(
@@ -320,6 +327,38 @@ impl MissionController for Controller {
             }
             Err(e) => {
                 error!("Panic when finding mission with mid {}: {}", mid_, e);
+                panic!(e.to_string());
+            }
+        }
+    }
+
+    fn get_typed_mission_list(
+        &self,
+        miss_type: models::missions::MissionType,
+    ) -> Vec<models::missions::Mission> {
+        use crate::schema::emtm_missions::dsl::*;
+        use db_models::missions::*;
+        let type_val = miss_type.to_val();
+        let result = emtm_missions
+            .filter(mission_type.eq(type_val))
+            .load::<Mission>(&self.connection);
+        match result {
+            Ok(missions) => {
+                let parts: Vec<Vec<db_models::missions::Participant>> = missions
+                    .iter()
+                    .map(|m| self.get_mission_participants(m.mid))
+                    .collect();
+                missions
+                    .into_iter()
+                    .zip(parts)
+                    .map(|(m, p)| models::missions::Mission::from_db(m, p))
+                    .collect()
+            }
+            Err(e) => {
+                error!(
+                    "Panic when finding mission with type {:?}: {}",
+                    mission_type, e
+                );
                 panic!(e.to_string());
             }
         }

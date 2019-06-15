@@ -5,6 +5,7 @@ pub mod mission_type {
     pub const QUESTIONNAIRE: i8 = 0;
     pub const TRANSLATION: i8 = 1;
     pub const ERRANDS: i8 = 2;
+    pub const TRADE: i8 = 3;
 }
 
 pub mod part_state_type {
