@@ -47,7 +47,7 @@ fn add_update_mission_test() {
         post_time: post_time,
         deadline: deadline,
         participants: participants,
-        max_participants: 5,
+        max_participants: Some(5),
         min_grade: None,
         max_grade: None,
         school: None,

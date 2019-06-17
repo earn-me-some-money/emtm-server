@@ -8,19 +8,19 @@ use crate::models;
 pub trait ErrandController {
     /// Adds a errand information
     /// # Arguments
-    /// * 'trade_item' - The errand instance to be added
-    fn add_errand(&self, trade_item: &models::Errand) -> Result<(), DbError>;
+    /// * 'errand_item' - The errand instance to be added
+    fn add_errand(&self, errand_item: &models::Errand) -> Result<(), DbError>;
     /// Query a errand from mid
     /// # Arguments
     /// 'mid' - The mid of the errand to be retrieved
-    fn get_trade(&self, mid: i32) -> Option<models::Errand>;
+    fn get_errand(&self, mid: i32) -> Option<models::Errand>;
 }
 
 impl ErrandController for Controller {
-    fn add_errand(&self, trade_item: &models::Errand) -> Result<(), DbError> {
+    fn add_errand(&self, errand_item: &models::Errand) -> Result<(), DbError> {
         use crate::schema::emtm_errands;
         let result = diesel::insert_into(emtm_errands::table)
-            .values(trade_item)
+            .values(errand_item)
             .execute(&self.connection);
 
         match result {
@@ -32,7 +32,7 @@ impl ErrandController for Controller {
         }
     }
 
-    fn get_trade(&self, mid_: i32) -> Option<models::Errand> {
+    fn get_errand(&self, mid_: i32) -> Option<models::Errand> {
         use crate::schema::emtm_errands::dsl::*;
         let result = emtm_errands
             .filter(mid.eq(mid_))
