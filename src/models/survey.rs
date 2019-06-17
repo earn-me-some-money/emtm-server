@@ -7,13 +7,13 @@ use serde_cbor;
 pub enum AnswerContent {
     SingleChoice(i32),
     MultiChoice(Vec<i32>),
-    Blank(String)
+    Blank(String),
 }
 
 pub struct Answer {
     pub mid: i32,
     pub user_id: i32,
-    pub user_answer: Vec<AnswerContent>
+    pub user_answer: Vec<AnswerContent>,
 }
 
 impl Answer {
@@ -22,7 +22,7 @@ impl Answer {
         Ok(db_models::Answer {
             mid: self.mid,
             user_id: self.user_id,
-            user_answer: serialized_answer
+            user_answer: serialized_answer,
         })
     }
     pub fn from_db(answer: db_models::Answer) -> Result<Self, serde_cbor::error::Error> {
@@ -30,11 +30,10 @@ impl Answer {
         Ok(Self {
             mid: answer.mid,
             user_id: answer.user_id,
-            user_answer: deserialized_answer
+            user_answer: deserialized_answer,
         })
     }
 }
-
 
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type")]
@@ -43,14 +42,13 @@ pub enum QuestionContent {
     SingleChoice(Vec<String>),
     MultiChoice(Vec<String>),
     /// Question description
-    Blank
+    Blank,
 }
-
 
 pub struct Question {
     pub mid: i32,
     pub description: String,
-    pub choices: QuestionContent
+    pub choices: QuestionContent,
 }
 
 impl Question {
@@ -60,7 +58,7 @@ impl Question {
             mid: self.mid,
             ordering,
             description: self.description,
-            choices: serialized_choices
+            choices: serialized_choices,
         })
     }
 
@@ -69,8 +67,7 @@ impl Question {
         Ok(Self {
             mid: answer.mid,
             description: answer.description,
-            choices: deserialized_choices
+            choices: deserialized_choices,
         })
     }
 }
-

@@ -14,13 +14,13 @@ table! {
 }
 
 table! {
-    emtm_errands (e_id) {
+    emtm_errands (mid) {
         mid -> Integer,
-        e_id -> Integer,
-        e_address -> Varchar,
-        e_phone_number -> Varchar,
-        e_pick_number -> Varchar,
-        e_info -> Varchar,
+        pickup_address -> Varchar,
+        phone_number -> Varchar,
+        item_code -> Nullable<Varchar>,
+        deliver_address -> Varchar,
+        other_info -> Varchar,
     }
 }
 
@@ -76,12 +76,12 @@ table! {
 }
 
 table! {
-    emtm_trades (t_id) {
+    emtm_trades (mid) {
         mid -> Integer,
-        t_id -> Integer,
-        t_type -> Varchar,
-        t_info -> Varchar,
-        t_loss -> Integer,
+        item_type -> Varchar,
+        item_info -> Varchar,
+        item_condition -> Tinyint,
+        address -> Varchar,
     }
 }
 

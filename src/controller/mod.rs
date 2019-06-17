@@ -1,8 +1,8 @@
 mod connection;
 pub mod mission_controller;
 pub mod school_controller_zh;
-pub mod user_controller;
 pub mod survey_controller;
+pub mod user_controller;
 
 pub use self::school_controller_zh::SchoolControllerZh;
 pub use self::user_controller::UserController;
