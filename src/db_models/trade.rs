@@ -10,6 +10,3 @@ pub struct Trade {
     pub item_condition: i8,
     pub address: String,
 }
-
-
-

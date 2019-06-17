@@ -2,6 +2,7 @@ mod connection;
 pub mod mission_controller;
 pub mod school_controller_zh;
 pub mod survey_controller;
+pub mod trade_controller;
 pub mod user_controller;
 
 pub use self::school_controller_zh::SchoolControllerZh;
