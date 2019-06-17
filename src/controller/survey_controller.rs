@@ -69,19 +69,14 @@ impl SurveyController for Controller {
 
         match result {
             Ok(questions) => {
-                let questions_result_list: Vec<_> = questions
+                //returns an error if any question encounters a problem
+                let questions_result_list: Result<Vec<_>, _> = questions
                     .into_iter()
                     .map(|q| {
-                        models::Question::from_db(q)
+                        models::Question::from_db(q).map_err(|e| DbError::new(&format!("failed to deserialize question: {}", e)))
                     }).collect();
 
-                for res in &questions_result_list {
-                    if let Err(error) = res {
-                        return Err(DbError::new(&format!("failed to deserialize question: {}", error)));
-                    }
-                }
-
-                Ok(questions_result_list.into_iter().map(Result::unwrap).collect())
+                questions_result_list
             }
             Err(err) => {
                 error!(
