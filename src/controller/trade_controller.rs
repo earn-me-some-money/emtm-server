@@ -26,7 +26,7 @@ impl TradeController for Controller {
         match result {
             Ok(_) => Ok(()),
             Err(err) => {
-                warn!("Failed to insert answer: {}", err);
+                warn!("Failed to insert trade: {}", err);
                 Err(DbError::new(&err.to_string()))
             }
         }
