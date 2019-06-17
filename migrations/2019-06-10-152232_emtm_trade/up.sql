@@ -1,4 +1,4 @@
-CREATE TABLE emtm_transaction
+CREATE TABLE emtm_trades
 (
     mid                 INTEGER NOT NULL,
     t_id                INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -8,7 +8,7 @@ CREATE TABLE emtm_transaction
 
  ) CHARACTER SET utf8mb4;
 
-ALTER TABLE `emtm_transaction`
+ALTER TABLE `emtm_trades`
     ADD CONSTRAINT `transaction_mission_id_contra` FOREIGN KEY (`mid`) REFERENCES `emtm_missions` (`mid`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 

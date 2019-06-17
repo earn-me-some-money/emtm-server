@@ -1,9 +1,8 @@
 table! {
-    emtm_answer (qa_id) {
-        qn_id -> Integer,
-        qa_id -> Integer,
+    emtm_answers (mid, user_id) {
+        mid -> Integer,
         user_id -> Integer,
-        user_answer -> Varchar,
+        user_answer -> Varbinary,
     }
 }
 
@@ -55,12 +54,11 @@ table! {
 }
 
 table! {
-    emtm_question (q_id) {
-        qn_id -> Integer,
-        q_id -> Integer,
-        q_type -> Bool,
-        q_content -> Varchar,
-        q_choice -> Varchar,
+    emtm_questions (mid, ordering) {
+        mid -> Integer,
+        ordering -> Integer,
+        description -> Varchar,
+        choices -> Varbinary,
     }
 }
 
@@ -78,14 +76,7 @@ table! {
 }
 
 table! {
-    emtm_survey (qn_id) {
-        mid -> Integer,
-        qn_id -> Integer,
-    }
-}
-
-table! {
-    emtm_transaction (t_id) {
+    emtm_trades (t_id) {
         mid -> Integer,
         t_id -> Integer,
         t_type -> Varchar,
@@ -115,30 +106,28 @@ table! {
     }
 }
 
-joinable!(emtm_answer -> emtm_students (user_id));
-joinable!(emtm_answer -> emtm_survey (qn_id));
+joinable!(emtm_answers -> emtm_missions (mid));
+joinable!(emtm_answers -> emtm_students (user_id));
 joinable!(emtm_cows -> emtm_users (uid));
 joinable!(emtm_errands -> emtm_missions (mid));
 joinable!(emtm_missions -> emtm_users (poster_uid));
 joinable!(emtm_missions -> school_zh (school));
 joinable!(emtm_participants -> emtm_missions (mid));
 joinable!(emtm_participants -> emtm_students (student_uid));
-joinable!(emtm_question -> emtm_survey (qn_id));
+joinable!(emtm_questions -> emtm_missions (mid));
 joinable!(emtm_students -> emtm_users (uid));
 joinable!(emtm_students -> school_zh (school_id));
-joinable!(emtm_survey -> emtm_missions (mid));
-joinable!(emtm_transaction -> emtm_missions (mid));
+joinable!(emtm_trades -> emtm_missions (mid));
 
 allow_tables_to_appear_in_same_query!(
-    emtm_answer,
+    emtm_answers,
     emtm_cows,
     emtm_errands,
     emtm_missions,
     emtm_participants,
-    emtm_question,
+    emtm_questions,
     emtm_students,
-    emtm_survey,
-    emtm_transaction,
+    emtm_trades,
     emtm_users,
     school_zh,
 );
