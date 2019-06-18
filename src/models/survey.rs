@@ -3,7 +3,7 @@ use serde::*;
 use crate::db_models;
 use serde_cbor;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum AnswerContent {
     SingleChoice(i32),
     MultiChoice(Vec<i32>),
