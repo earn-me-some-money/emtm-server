@@ -73,6 +73,13 @@ pub trait MissionController {
         &self,
         mission_type: models::missions::MissionType,
     ) -> Vec<models::missions::Mission>;
+    /// Get missions with multiple mid, this is faster than calling
+    /// get_mission_from_mid multiple times.
+    /// Participants will not be loaded in this method.
+    /// mids that are not associated with a mission will be ignored
+    /// # Arguments
+    /// * 'mids' - the id(s) of the missions to be searched
+    fn get_missions_with_mid_list(&self, mids: Vec<i32>) -> Vec<models::missions::Mission>;
 }
 
 impl MissionController for Controller {
@@ -359,6 +366,33 @@ impl MissionController for Controller {
                     "Panic when finding mission with type {:?}: {}",
                     mission_type, e
                 );
+                panic!(e.to_string());
+            }
+        }
+    }
+
+    fn get_missions_with_mid_list(&self, mids: Vec<i32>) -> Vec<models::Mission> {
+        use crate::schema::emtm_missions::dsl::*;
+        use db_models::missions::*;
+        if mids.is_empty() {
+            return vec![];
+        }
+
+        let mut query_builder = emtm_missions.filter(mid.eq(mids[0])).into_boxed();
+        if mids.len() > 1 {
+            for mid_ in &mids[1..] {
+                query_builder = query_builder.or_filter(mid.eq(mid_));
+            }
+        }
+
+        let result = query_builder.load::<Mission>(&self.connection);
+        match result {
+            Ok(missions) => missions
+                .into_iter()
+                .map(|m| models::Mission::from_db(m, vec![]))
+                .collect(),
+            Err(e) => {
+                error!("Panic when finding mission list: {}", e);
                 panic!(e.to_string());
             }
         }
