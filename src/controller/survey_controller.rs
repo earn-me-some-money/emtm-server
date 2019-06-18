@@ -27,7 +27,7 @@ pub trait SurveyController {
     /// # Arguments
     /// 'mid' - The mid of the questionnaire to be retrieved
     fn get_question_answers(&self, mid: i32) -> Vec<models::Answer>;
-    /// Get all the questionnaires a student has answered
+    /// Get all the questionnaires' mids a student has answered
     /// # Arguments
     /// 'uid' - The uid of the students to be searched
     fn get_student_answered(&self, uid: i32) -> Vec<i32>;

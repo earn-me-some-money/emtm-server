@@ -3,17 +3,17 @@ use chrono::NaiveDateTime;
 use chrono::NaiveTime;
 
 use emtm_db;
-use emtm_db::controller::Controller;
-use emtm_db::controller::user_controller::UserController;
 use emtm_db::controller::mission_controller::MissionController;
 use emtm_db::controller::trade_controller::TradeController;
+use emtm_db::controller::user_controller::UserController;
+use emtm_db::controller::Controller;
 
 use emtm_db::models::missions::*;
-use emtm_db::models::users::*;
 use emtm_db::models::trade::*;
+use emtm_db::models::users::*;
 
 #[test]
-fn add_trade_test(){
+fn add_trade_test() {
     let ctrl = Controller::test_new();
     ctrl.revert_all();
     ctrl.migrate();
@@ -61,7 +61,7 @@ fn add_trade_test(){
     };
     ctrl.add_mission(&mission).unwrap();
 
-    let trade = Trade{
+    let trade = Trade {
         mid: 1,
         item_type: "test".to_string(),
         item_info: "goods".to_string(),
@@ -71,7 +71,7 @@ fn add_trade_test(){
     ctrl.add_trade(&trade).unwrap();
 
     let res = ctrl.get_trade(1).unwrap();
-    
+
     assert!(true);
     assert_eq!(res.item_info, "goods");
 }

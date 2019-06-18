@@ -2,16 +2,16 @@ use chrono::NaiveDate;
 use chrono::NaiveDateTime;
 use chrono::NaiveTime;
 use emtm_db;
-use emtm_db::controller::Controller;
-use emtm_db::controller::user_controller::UserController;
-use emtm_db::controller::mission_controller::MissionController;
 use emtm_db::controller::errand_controller::ErrandController;
+use emtm_db::controller::mission_controller::MissionController;
+use emtm_db::controller::user_controller::UserController;
+use emtm_db::controller::Controller;
 use emtm_db::models::errand::*;
-use emtm_db::models::users::*;
 use emtm_db::models::missions::*;
+use emtm_db::models::users::*;
 
 #[test]
-fn add_errand_test(){
+fn add_errand_test() {
     let ctrl = Controller::test_new();
     ctrl.revert_all();
     ctrl.migrate();
@@ -59,7 +59,7 @@ fn add_errand_test(){
     };
     ctrl.add_mission(&mission).unwrap();
 
-    let errand = Errand{
+    let errand = Errand {
         mid: 1,
         pickup_address: "s".to_string(),
         phone_number: "12334454665".to_string(),
@@ -70,7 +70,7 @@ fn add_errand_test(){
     ctrl.add_errand(&errand).unwrap();
 
     let res = ctrl.get_errand(1).unwrap();
-    
+
     assert!(true);
     assert_eq!(res.pickup_address, "s");
 }
