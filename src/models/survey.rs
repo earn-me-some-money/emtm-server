@@ -36,7 +36,6 @@ impl Answer {
 }
 
 #[derive(Serialize, Deserialize)]
-#[serde(tag = "type")]
 pub enum QuestionContent {
     /// Question description and each choice
     SingleChoice(Vec<String>),
