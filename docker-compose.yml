@@ -16,7 +16,7 @@ services:
     volumes:
       - emtm-db:/var/lib/mysql
   emtm:
-    build: .
+    build: emtm-service
     ports:
     - "6789:6789"
     depends_on:
@@ -25,7 +25,7 @@ services:
     - db
 
   migration:
-    image: emtm:latest
+    image: emtm-service
     command: "cd /usr/src/emtm/emtm-db && diesel setup"
     depends_on:
     - db
