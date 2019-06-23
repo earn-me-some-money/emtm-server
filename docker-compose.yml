@@ -24,21 +24,25 @@ services:
     - "6789:6789"
     depends_on:
     - db
+    # - migration
     links:
     - db
     env_file:
       - .env
     volumes:
-      - ./scripts:/scripts
-    entrypoint: "bash /scripts/wait-for-it.sh 127.0.0.1:3306"
+      - ./scripts:/usr/src/emtm/scripts
+    entrypoint: "bash /usr/src/emtm/scripts/entrypoint.sh"
+    environment: 
+      - EMTM_LOG=info
+      - DATABASE_URL=mysql://root:ROOT_PASSWORD@db:3306/EMTM
 
-  migration:
-    image: emtm-service
-    command: "cd /usr/src/emtm/emtm-db && ls -la"
-    depends_on:
-    - db
-    links:
-    - db
-    env_file:
-      - .env
+  # migration:
+  #   image: emtm-service
+  #   command: "cd /usr/src/emtm/emtm-db && diesel setup"
+  #   depends_on:
+  #   - db
+  #   links:
+  #   - db
+  #   env_file:
+  #     - .env
 
