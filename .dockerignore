@@ -6,7 +6,6 @@ EMTM.paw
 emtm-indexes
 
 .DS_Store
-.env
 .vscode
 .ideacard
 .idea

@@ -2,8 +2,8 @@ version: '3'
 services:
   db:
     image: mysql:5.7
-    ports: 
-      - "9877:3306"
+    # ports: 
+    #   - "9877:3306"
     environment:
       MYSQL_DATABASE: 'EMTM'
       MYSQL_USER: 'emtm'
@@ -14,7 +14,10 @@ services:
     expose:
       - '3306'
     volumes:
-      - emtm-db:/var/lib/mysql
+      - ./emtm-data:/var/lib/mysql
+    env_file:
+      - .env
+
   emtm:
     image: emtm-service
     ports:
@@ -23,6 +26,11 @@ services:
     - db
     links:
     - db
+    env_file:
+      - .env
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: "bash /scripts/wait-for-it.sh 127.0.0.1:3306"
 
   migration:
     image: emtm-service
@@ -31,5 +39,6 @@ services:
     - db
     links:
     - db
-volumes:
-  emtm-db:
+    env_file:
+      - .env
+
