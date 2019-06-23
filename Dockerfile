@@ -4,20 +4,18 @@ WORKDIR /usr/src/emtm
 
 COPY . .
 
-# change source for China
 RUN mkdir -p $HOME/.cargo;
-RUN if [ "$origin" = "cn" ]; then cp crate-io-ustc $HOME/.cargo/config; fi
+RUN if [ "$origin" = "cn" ]; then cp crate-io-china $HOME/.cargo/config; fi
 # RUN if [ "$origin" = "cn" ]; then export http_proxy="http://127.0.0.1:8088"; export HTTP_PROXY="http://127.0.0.1:8088"; export https_proxy="http://127.0.0.1:8088"; export HTTPS_PROXY="http://127.0.0.1:8088"; echo $HTTP_PROXY; fi
 RUN ls -la $HOME/.cargo;
 
-RUN cargo update
+WORKDIR /usr/src/emtm/emtm-db
+RUN cargo install diesel_cli --no-default-features --features mysql
+
+WORKDIR /usr/src/emtm
+# change source for China
+
 RUN cargo build --release
 
-FROM alpine:3.9
-RUN apk add --no-cache mysql-client
-# copy the build artifact from the build stage
-COPY --from=build /usr/src/emtm/target/release/emtm-web .
-
-# set the startup command to run your binary
-ENTRYPOINT ["./emtm-web"]
+ENTRYPOINT ["./target/release/emtm-web"]
 

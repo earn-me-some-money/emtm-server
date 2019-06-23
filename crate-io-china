@@ -1,0 +1,10 @@
+[source.crates-io]
+registry = "https://github.com/rust-lang/crates.io-index"
+replace-with = 'ustc'
+
+[registry]
+index = "https://mirrors.ustc.edu.cn/crates.io-index/"
+
+[source.ustc]
+index = "https://mirrors.ustc.edu.cn/crates.io-index"
+

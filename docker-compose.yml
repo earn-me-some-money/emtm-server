@@ -1,12 +1,6 @@
 version: '3'
 services:
-  emtm-web:
-    build: .
-    ports:
-    - "9876:8088"
-    links:
-    - emtm-mysql
-  emtm-mysql:
+  db:
     image: mysql:5.7
     ports: 
       - "9877:3306"
@@ -21,5 +15,21 @@ services:
       - '3306'
     volumes:
       - emtm-db:/var/lib/mysql
+  emtm:
+    build: .
+    ports:
+    - "6789:6789"
+    depends_on:
+    - db
+    links:
+    - db
+
+  migration:
+    image: emtm:latest
+    command: "cd /usr/src/emtm/emtm-db && diesel setup"
+    depends_on:
+    - db
+    links:
+    - db
 volumes:
   emtm-db:
