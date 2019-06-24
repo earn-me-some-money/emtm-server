@@ -28,13 +28,6 @@ COPY ./Cargo.toml ./Cargo.toml
 
 RUN cargo build --release
 
-WORKDIR /usr/src/emtm/emtm-web
-COPY ./emtm-web/* .
-WORKDIR /usr/src/emtm/emtm-db
-COPY ./emtm-db/* .
-WORKDIR /usr/src/emtm/emtm-verify
-COPY ./emtm-verify/* .
-
 WORKDIR /usr/src/emtm
 COPY . .
 
