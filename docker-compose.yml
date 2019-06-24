@@ -2,6 +2,7 @@ version: '3'
 services:
   db:
     image: mysql:5.7
+    restart: always
     # ports: 
     #   - "9877:3306"
     environment:
@@ -20,6 +21,7 @@ services:
 
   emtm:
     image: registry.cn-hangzhou.aliyuncs.com/emtm-web/emtm-service:master
+    restart: always
     ports:
     - "6789:6789"
     expose:
