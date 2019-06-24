@@ -19,9 +19,11 @@ services:
       - .env
 
   emtm:
-    image: emtm-service
+    image: registry.cn-hangzhou.aliyuncs.com/emtm-web/emtm-service:0.1.4
     ports:
     - "6789:6789"
+    expose:
+    - "6789"
     depends_on:
     - db
     # - migration
