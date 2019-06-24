@@ -1342,7 +1342,7 @@ pub fn get_tasks(data: web::Json<json_objs::TaskTypeObj>) -> HttpResponse {
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn get_tasks_by_range(data: web::Json<json_objs::TaskRangeObj>) -> HttpResponse {
+pub fn get_tasks_top(data: web::Json<json_objs::TaskRangeObj>) -> HttpResponse {
     let mut result_obj = json_objs::GetTasksObj {
         code: true,
         err_message: "".to_string(),
@@ -1350,9 +1350,14 @@ pub fn get_tasks_by_range(data: web::Json<json_objs::TaskRangeObj>) -> HttpRespo
     };
 
     let db_control = Controller::new();
-    let (start, end) = (data.start, data.start + data.offset);
+    let latest_mid = db_control.get_missions_list().len() as i32;
+
+    let (start, end) = (latest_mid - data.number, latest_mid);
 
     for index in start..end {
+        if index <= 0 {
+            continue;
+        }
         match db_control.get_mission_from_mid(index) {
             Some(mission) => {
                 // Get poster name

@@ -76,8 +76,7 @@ pub struct TaskTypeObj {
 // Task id Range Json Struct
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TaskRangeObj {
-    pub start: i32,
-    pub offset: i32,
+    pub number: i32
 }
 
 #[derive(Debug, Serialize, Deserialize)]
