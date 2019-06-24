@@ -9,3 +9,6 @@ members = [
 [patch.'https://github.com/earn-me-some-money/emtm-db.git']
 emtm_db = { path = "emtm-db" }
 
+[patch.'https://github.com/earn-me-some-money/emtm-verify.git']
+emtm-verify = { path = "emtm-verify" }
+
