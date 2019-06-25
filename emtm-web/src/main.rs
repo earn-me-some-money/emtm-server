@@ -1,5 +1,7 @@
-use actix_web::{middleware, web, App, HttpServer};
+use actix_web::{middleware, web, App, HttpServer, FromRequest};
 use emtm_web::route::router;
+
+use emtm_web::control::json_objs;
 
 fn main() -> std::io::Result<()> {
     openssl_probe::init_ssl_cert_env_vars();
@@ -62,7 +64,9 @@ fn main() -> std::io::Result<()> {
             )
             .service(web::resource("/task/errand").route(web::get().to(router::check_errand)))
             // User Verify
-            .service(web::resource("/user/verify").route(web::post().to(router::user_verify)))
+            .service(web::resource("/user/verify").data(
+                web::Form::<json_objs::VerifyInfo>::configure(|cfg| cfg.limit(40000000))
+            ).route(web::post().to(router::user_verify)))
             // Mission Search
             .service(web::resource("/task/search").route(web::get().to(router::search_mission)))
             // Receive Tasks API
