@@ -685,7 +685,7 @@ pub fn check_task_self_release(data: web::Json<json_objs::UserIdObj>) -> HttpRes
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn check_question_naire(data: web::Json<json_objs::SubmitTaskObj>) -> HttpResponse {
+pub fn check_question_naire_answer(data: web::Json<json_objs::SubmitTaskObj>) -> HttpResponse {
     let mut result_obj = json_objs::AllAnswerObj {
         code: true,
         err_message: "".to_string(),
@@ -783,6 +783,44 @@ pub fn check_question_naire(data: web::Json<json_objs::SubmitTaskObj>) -> HttpRe
             }
         } else {
             return HttpResponse::Ok().json(result_obj);
+        }
+    }
+
+    HttpResponse::Ok().json(result_obj)
+}
+
+pub fn check_question_naire(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
+    let mut result_obj = json_objs::QuestionResultObj {
+        code: true,
+        err_message: "".to_string(),
+        questions: vec![]
+    };
+
+    let db_control = Controller::new();
+
+    match db_control.get_questionnaire(data.task_mid) {
+        Ok(questionnaires) => {
+            let mut index = 0;
+            for question in questionnaires.into_iter() {
+                let (q_type, choices) = match question.choices {
+                    QuestionContent::SingleChoice(s) => (1, Some(s)),
+                    QuestionContent::MultiChoice(m) => (2, Some(m)),
+                    QuestionContent::Blank => (0, None),
+                };
+
+                let res_question = json_objs::QuestionObj {
+                    order: index,
+                    q_type: q_type,
+                    content: question.description.clone(),
+                    choices: choices
+                };
+                result_obj.questions.push(res_question);
+                index += 1;
+            }
+        }
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot find target questionnaire task in DB!".to_string();
         }
     }
 

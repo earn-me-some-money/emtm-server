@@ -50,6 +50,10 @@ fn main() -> std::io::Result<()> {
                     .route(web::get().to(router::check_task_self_release)),
             )
             .service(
+                web::resource("/task/question-naire-answer")
+                    .route(web::get().to(router::check_question_naire_answer)),
+            )
+            .service(
                 web::resource("/task/question-naire")
                     .route(web::get().to(router::check_question_naire)),
             )

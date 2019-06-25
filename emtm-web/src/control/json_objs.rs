@@ -407,6 +407,14 @@ pub struct AllAnswerObj {
     pub answers: Vec<AnswerObj>,
 }
 
+// Get Question task detail obj
+#[derive(Debug, Serialize, Deserialize)]
+pub struct QuestionResultObj {
+    pub code: bool,
+    pub err_message: String,
+    pub questions: Vec<QuestionObj>,
+}
+
 // Get transaction task detail obj
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TransactionResultObj {
