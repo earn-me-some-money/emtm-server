@@ -12,3 +12,10 @@ curl http://localhost:6789/info/cow\
  -d '{"userid":"wechat12307"}'
 echo ""
 
+echo "Get Cow Info Test Case 3: (False)"
+curl http://localhost:6789/info/cow\
+ -H "Content-Type:application/json"\
+ -X GET\
+ -d '{"userid":"[]["}'
+echo ""
+

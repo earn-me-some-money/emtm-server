@@ -11,3 +11,10 @@ curl http://localhost:6789/credit\
  -X GET\
  -d '{"userid":"wechat12307"}'
 echo ""
+
+echo "Test Case 3: Student user check credit:(True)"
+curl http://localhost:6789/credit\
+ -H "Content-Type:application/json"\
+ -X GET\
+ -d '{"userid":"[][]]"}'
+echo ""

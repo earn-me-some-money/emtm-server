@@ -18,3 +18,10 @@ curl http://localhost:6789/task/top\
  -X GET\
  -d '{"number":2}'
 echo ""
+
+echo "Get Top Tasks Test Case 4: "
+curl http://localhost:6789/task/top\
+ -H "Content-Type:application/json"\
+ -X GET\
+ -d '{"number":"[]]"}'
+echo ""

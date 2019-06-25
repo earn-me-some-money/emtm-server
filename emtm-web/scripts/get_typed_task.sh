@@ -18,3 +18,10 @@ curl http://localhost:6789/task/type\
  -X GET\
  -d '{"task_type":2}'
 echo ""
+
+echo "Get Typed Tasks Test Case 4: Get Errand Tasks"
+curl http://localhost:6789/task/type\
+ -H "Content-Type:application/json"\
+ -X GET\
+ -d '{"task_type":"[]]"}'
+echo ""

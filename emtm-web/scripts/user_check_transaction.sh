@@ -12,3 +12,23 @@ curl http://localhost:6789/task/transaction\
  -d '{"task_mid":1, "userid":"wechat12306", "poster_id":1}'
 echo ""
 
+echo "Test Case 3: (False):"
+curl http://localhost:6789/task/transaction\
+ -H "Content-Type:application/json"\
+ -X GET\
+ -d '{"task_mid":"op", "userid":"wechat12306", "poster_id":1}'
+echo ""
+
+echo "Test Case 3: (False):"
+curl http://localhost:6789/task/transaction\
+ -H "Content-Type:application/json"\
+ -X GET\
+ -d '{"task_mid":1, "userid":"[]]", "poster_id":1}'
+echo ""
+
+echo "Test Case 3: (False):"
+curl http://localhost:6789/task/transaction\
+ -H "Content-Type:application/json"\
+ -X GET\
+ -d '{"task_mid":1, "userid":"wechat12306", "poster_id":"[]]"}'
+echo ""

@@ -19,3 +19,10 @@ curl http://localhost:6789/info/stu\
  -d '{"userid":"wechat12306"}'
 echo ""
 
+echo "Get Student Info Test Case 4: (False)"
+curl http://localhost:6789/info/stu\
+ -H "Content-Type:application/json"\
+ -X GET\
+ -d '{"userid":"[][]]"}'
+echo ""
+
