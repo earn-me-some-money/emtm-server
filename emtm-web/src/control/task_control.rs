@@ -1359,7 +1359,7 @@ pub fn get_tasks_top(data: web::Json<json_objs::TaskRangeObj>) -> HttpResponse {
     let db_control = Controller::new();
     let latest_mid = db_control.get_missions_list().len() as i32;
 
-    let (start, end) = (latest_mid - data.number, latest_mid);
+    let (start, end) = (latest_mid - data.number + 1, latest_mid + 1);
 
     for index in start..end {
         if index <= 0 {
