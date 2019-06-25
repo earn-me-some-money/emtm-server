@@ -94,8 +94,7 @@ pub fn logup_cow(
             result_obj.code = false;
             result_obj.err_message = format!("{}", err);
         }
-    }
-    else {
+    } else {
         result_obj.code = false;
     }
 
@@ -207,8 +206,7 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
             result_obj.code = false;
             result_obj.err_message = format!("{}", err);
         }
-    }
-    else {
+    } else {
         result_obj.code = false;
     }
 

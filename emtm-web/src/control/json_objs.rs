@@ -76,7 +76,7 @@ pub struct TaskTypeObj {
 // Task id Range Json Struct
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TaskRangeObj {
-    pub number: i32
+    pub number: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -281,10 +281,14 @@ pub struct CreditScoreObj {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SearchElementObj {
     pub mid: i32,
-    pub name: String,
-    pub content: String,
-    pub poster_userid: String,
-    pub time_limit: String,
+    pub poster_id: i32,
+    pub poster_name: String,
+    pub task_state: bool,
+    pub task_name: String,
+    pub task_intro: String,
+    pub task_mode: i32,
+    pub task_pay: i32,
+    pub task_time_limit: String,
     pub score: f32,
 }
 

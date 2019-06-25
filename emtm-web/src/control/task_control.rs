@@ -1057,29 +1057,36 @@ pub fn search_mission(data: web::Json<json_objs::MissionSearchObj>) -> HttpRespo
         // Search mission with element's mid
         match db_control.get_mission_from_mid(ele.0) {
             Some(the_mission) => {
-                // Find poster wechat id
+                // Find poster wechat name
                 let poster_id: UserId = UserId::Uid(the_mission.poster_uid);
-                let poster_wechatid = match db_control.get_user_from_identifier(poster_id) {
-                    Some(User::Cow(cow)) => cow.wechat_id,
-                    Some(User::Student(stu)) => stu.wechat_id,
+                let poster_name = match db_control.get_user_from_identifier(poster_id) {
+                    Some(User::Cow(cow)) => cow.username,
+                    Some(User::Student(stu)) => stu.username,
                     None => "".to_string(),
                 };
 
-                // Check wechat-id successfully get
-                if poster_wechatid.len() == 0 {
+                // Check wechat-name successfully get
+                if poster_name.len() == 0 {
                     result_obj.code = false;
                     result_obj.err_message =
-                        "Error! Cannot get target mission-poster's wechat id!".to_string();
+                        "Error! Cannot get target mission-poster's wechat name!".to_string();
                     return HttpResponse::Ok().json(result_obj);
                 }
+
+                // Judge task state
+                let task_state = the_mission.deadline <= (Local::now()).naive_local();
 
                 // Push new search result into response
                 let new_search_result = json_objs::SearchElementObj {
                     mid: ele.0,
-                    name: the_mission.name,
-                    content: the_mission.content,
-                    poster_userid: poster_wechatid,
-                    time_limit: the_mission.deadline.to_string(),
+                    poster_id: the_mission.poster_uid,
+                    poster_name: poster_name,
+                    task_state: task_state,
+                    task_name: the_mission.name,
+                    task_intro: the_mission.content,
+                    task_pay: the_mission.bounty,
+                    task_mode: the_mission.mission_type.to_val().into(),
+                    task_time_limit: the_mission.deadline.to_string(),
                     score: ele.1,
                 };
                 result_obj.search_result.push(new_search_result);
