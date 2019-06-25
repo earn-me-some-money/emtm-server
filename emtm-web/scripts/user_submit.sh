@@ -21,3 +21,21 @@ curl http://localhost:6789/task/submit\
  -H "Content-Type:application/json"\
  -d '{"task_mid":5, "userid":"wechat12306", "student_id":2}'
 echo ""
+
+echo "Test Case 5: (False):"
+curl http://localhost:6789/task/submit\
+ -H "Content-Type:application/json"\
+ -d '{"task_mid":"[]", "userid":"wechat12306", "student_id":2}'
+echo ""
+
+echo "Test Case 6: (False):"
+curl http://localhost:6789/task/submit\
+ -H "Content-Type:application/json"\
+ -d '{"task_mid":5, "userid":"[]]", "student_id":2}'
+echo ""
+
+echo "Test Case 7: (False):"
+curl http://localhost:6789/task/submit\
+ -H "Content-Type:application/json"\
+ -d '{"task_mid":5, "userid":"wechat12306", "student_id":"[]"}'
+echo ""
