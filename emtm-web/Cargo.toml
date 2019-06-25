@@ -24,5 +24,5 @@ regex = "*"
 
 chrono = "0.4.6"
 
-emtm_db = { git = "https://github.com/earn-me-some-money/emtm-db.git" }
-emtm-verify = { git = "https://github.com/earn-me-some-money/emtm-verify.git" }
+emtm_db = { path = "../emtm-db" }
+emtm-verify = { path = "../emtm-verify" }
