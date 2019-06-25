@@ -80,40 +80,40 @@ pub fn release_task_errand(data: web::Json<json_objs::ErrandObj>) -> HttpRespons
     task_control::release_task_errand(data)
 }
 
-pub fn check_task(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
-    task_control::check_task(data)
+pub fn check_task(req: HttpRequest) -> HttpResponse {
+    task_control::check_task(req)
 }
 
-pub fn check_task_self_receive(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
-    task_control::check_task_self_receive(data)
+pub fn check_task_self_receive(req: HttpRequest) -> HttpResponse {
+    task_control::check_task_self_receive(req)
 }
 
-pub fn check_task_self_release(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
-    task_control::check_task_self_release(data)
+pub fn check_task_self_release(req: HttpRequest) -> HttpResponse {
+    task_control::check_task_self_release(req)
 }
 
-pub fn check_question_naire(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
-    task_control::check_question_naire(data)
+pub fn check_question_naire(req: HttpRequest) -> HttpResponse {
+    task_control::check_question_naire(req)
 }
 
-pub fn check_question_naire_answer(data: web::Json<json_objs::SubmitTaskObj>) -> HttpResponse {
-    task_control::check_question_naire_answer(data)
+pub fn check_question_naire_answer(req: HttpRequest) -> HttpResponse {
+    task_control::check_question_naire_answer(req)
 }
 
-pub fn check_transaction(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
-    task_control::check_transaction(data)
+pub fn check_transaction(req: HttpRequest) -> HttpResponse {
+    task_control::check_transaction(req)
 }
 
-pub fn check_errand(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
-    task_control::check_errand(data)
+pub fn check_errand(req: HttpRequest) -> HttpResponse {
+    task_control::check_errand(req)
 }
 
 pub fn recharge(data: web::Json<json_objs::RechargeObj>) -> HttpResponse {
     main_control::recharge(data)
 }
 
-pub fn search_mission(data: web::Json<json_objs::MissionSearchObj>) -> HttpResponse {
-    task_control::search_mission(data)
+pub fn search_mission(req: HttpRequest) -> HttpResponse {
+    task_control::search_mission(req)
 }
 
 // Student Specific - APIs
@@ -141,16 +141,16 @@ pub fn submit_task_stu(data: web::Json<json_objs::SubmitQuestionNaireObj>) -> Ht
     task_control::submit_task_stu(data)
 }
 
-pub fn check_credit(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
-    main_control::check_credit(data)
+pub fn check_credit(req: HttpRequest) -> HttpResponse {
+    main_control::check_credit(req)
 }
 
 pub fn withdraw(data: web::Json<json_objs::WithdrawObj>) -> HttpResponse {
     main_control::withdraw(data)
 }
 
-pub fn get_balance(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
-    main_control::get_balance(data)
+pub fn get_balance(req: HttpRequest) -> HttpResponse {
+    main_control::get_balance(req)
 }
 
 pub fn user_verify(
@@ -161,25 +161,25 @@ pub fn user_verify(
 
 use futures::Future;
 pub fn get_wechatid(
-    data: web::Json<json_objs::GetWechatIdObj>,
+    req: HttpRequest,
 ) -> Box<Future<Item = HttpResponse, Error = actix_web::Error>> {
-    main_control::get_wechatid(data)
+    main_control::get_wechatid(req)
 }
 
-pub fn get_tasks(data: web::Json<json_objs::TaskTypeObj>) -> HttpResponse {
-    task_control::get_tasks(data)
+pub fn get_tasks(req: HttpRequest) -> HttpResponse {
+    task_control::get_tasks(req)
 }
 
-pub fn get_tasks_top(data: web::Json<json_objs::TaskRangeObj>) -> HttpResponse {
-    task_control::get_tasks_top(data)
+pub fn get_tasks_top(req: HttpRequest) -> HttpResponse {
+    task_control::get_tasks_top(req)
 }
 
-pub fn get_cow_info(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
-    main_control::get_cow_info(data)
+pub fn get_cow_info(req: HttpRequest) -> HttpResponse {
+    main_control::get_cow_info(req)
 }
 
-pub fn get_stu_info(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
-    main_control::get_stu_info(data)
+pub fn get_stu_info(req: HttpRequest) -> HttpResponse {
+    main_control::get_stu_info(req)
 }
 
 pub fn edit_cow_info(data: web::Json<json_objs::CowEditInfoObj>) -> HttpResponse {

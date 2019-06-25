@@ -5,7 +5,7 @@ extern crate chrono;
 extern crate emtm_db;
 extern crate json;
 
-use actix_web::{web, HttpResponse};
+use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::Local;
 
 use crate::control::json_objs;
@@ -368,7 +368,7 @@ pub fn release_task_errand(data: web::Json<json_objs::ErrandObj>) -> HttpRespons
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn check_task(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
+pub fn check_task(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::TaskDetailObj {
         code: false,
         err_message: "".to_string(),
@@ -389,6 +389,16 @@ pub fn check_task(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
         // Accepter and Finisher list
         accept_users: None,
         finish_users: None,
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::CheckTaskObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     // Init db-control
@@ -570,11 +580,21 @@ pub fn check_task(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn check_task_self_receive(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
+pub fn check_task_self_receive(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::GetTasksObj {
         code: true,
         err_message: "".to_string(),
         tasks: vec![],
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::UserIdObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     // Init db-control
@@ -635,11 +655,21 @@ pub fn check_task_self_receive(data: web::Json<json_objs::UserIdObj>) -> HttpRes
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn check_task_self_release(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
+pub fn check_task_self_release(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::GetTasksObj {
         code: true,
         err_message: "".to_string(),
         tasks: vec![],
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::UserIdObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     // Init db-control
@@ -685,11 +715,21 @@ pub fn check_task_self_release(data: web::Json<json_objs::UserIdObj>) -> HttpRes
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn check_question_naire_answer(data: web::Json<json_objs::SubmitTaskObj>) -> HttpResponse {
+pub fn check_question_naire_answer(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::AllAnswerObj {
         code: true,
         err_message: "".to_string(),
         answers: vec![],
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::SubmitTaskObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();
@@ -789,11 +829,21 @@ pub fn check_question_naire_answer(data: web::Json<json_objs::SubmitTaskObj>) ->
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn check_question_naire(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
+pub fn check_question_naire(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::QuestionResultObj {
         code: true,
         err_message: "".to_string(),
-        questions: vec![]
+        questions: vec![],
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::CheckTaskObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();
@@ -812,7 +862,7 @@ pub fn check_question_naire(data: web::Json<json_objs::CheckTaskObj>) -> HttpRes
                     order: index,
                     q_type: q_type,
                     content: question.description.clone(),
-                    choices: choices
+                    choices: choices,
                 };
                 result_obj.questions.push(res_question);
                 index += 1;
@@ -820,14 +870,15 @@ pub fn check_question_naire(data: web::Json<json_objs::CheckTaskObj>) -> HttpRes
         }
         Err(_) => {
             result_obj.code = false;
-            result_obj.err_message = "Error! Cannot find target questionnaire task in DB!".to_string();
+            result_obj.err_message =
+                "Error! Cannot find target questionnaire task in DB!".to_string();
         }
     }
 
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn check_transaction(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
+pub fn check_transaction(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::TransactionResultObj {
         code: true,
         err_message: "".to_string(),
@@ -835,6 +886,16 @@ pub fn check_transaction(data: web::Json<json_objs::CheckTaskObj>) -> HttpRespon
         info: "".to_string(),
         loss: 0,
         address: "".to_string(),
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::CheckTaskObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();
@@ -856,7 +917,7 @@ pub fn check_transaction(data: web::Json<json_objs::CheckTaskObj>) -> HttpRespon
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn check_errand(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
+pub fn check_errand(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::ErrandResultObj {
         code: true,
         err_message: "".to_string(),
@@ -865,6 +926,16 @@ pub fn check_errand(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
         phone_number: "".to_string(),
         pick_number: "".to_string(),
         info: "".to_string(),
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::CheckTaskObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();
@@ -1067,11 +1138,21 @@ pub fn receive_task(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn search_mission(data: web::Json<json_objs::MissionSearchObj>) -> HttpResponse {
+pub fn search_mission(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::SearchResultObj {
         code: true,
         err_message: "".to_string(),
         search_result: vec![],
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::MissionSearchObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();
@@ -1340,11 +1421,21 @@ pub fn submit_task_stu(data: web::Json<json_objs::SubmitQuestionNaireObj>) -> Ht
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn get_tasks(data: web::Json<json_objs::TaskTypeObj>) -> HttpResponse {
+pub fn get_tasks(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::GetTasksObj {
         code: true,
         err_message: "".to_string(),
         tasks: vec![],
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::TaskTypeObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();
@@ -1387,11 +1478,21 @@ pub fn get_tasks(data: web::Json<json_objs::TaskTypeObj>) -> HttpResponse {
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn get_tasks_top(data: web::Json<json_objs::TaskRangeObj>) -> HttpResponse {
+pub fn get_tasks_top(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::GetTasksObj {
         code: true,
         err_message: "".to_string(),
         tasks: vec![],
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::TaskRangeObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();

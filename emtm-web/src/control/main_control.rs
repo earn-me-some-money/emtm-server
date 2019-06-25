@@ -8,7 +8,7 @@ use actix_web::client::PayloadError;
 use actix_web::{
     client::{Client, SendRequestError},
     http::StatusCode,
-    web, HttpResponse,
+    web, HttpRequest, HttpResponse,
 };
 use chrono::{Local, NaiveDateTime};
 use emtm_db::controller::{
@@ -44,11 +44,21 @@ pub fn index() -> HttpResponse {
 
 // Credit And Account Management
 
-pub fn check_credit(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
+pub fn check_credit(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::CreditScoreObj {
         code: true,
         err_message: "".to_string(),
         credit_score: 0,
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::UserIdObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();
@@ -191,7 +201,7 @@ pub fn withdraw(data: web::Json<json_objs::WithdrawObj>) -> HttpResponse {
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn get_balance(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
+pub fn get_balance(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::BalanceObj {
         code: true,
         err_message: "".to_string(),
@@ -199,6 +209,16 @@ pub fn get_balance(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
     };
 
     let db_control = Controller::new();
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::UserIdObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
+    };
 
     let user_wechat_id: UserId = UserId::WechatId(&data.userid);
     let user_balance = match db_control.get_user_from_identifier(user_wechat_id) {
@@ -258,12 +278,20 @@ pub fn verify(
 
 // Get User's wechat openid
 pub fn get_wechatid(
-    data: web::Json<json_objs::GetWechatIdObj>,
+    req: HttpRequest,
 ) -> Box<Future<Item = HttpResponse, Error = actix_web::Error>> {
     let mut result_obj = json_objs::WechatIdResultObj {
         openid: "None".to_string(),
         errcode: 0,
         errmsg: "None".to_string(),
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::GetWechatIdObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            return Box::new(futures::future::ok(HttpResponse::BadRequest().json(result_obj)));
+        }
     };
 
     let empty_form = json_objs::ResponseForm {
@@ -310,7 +338,7 @@ pub fn get_wechatid(
     Box::new(ret)
 }
 
-pub fn get_cow_info(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
+pub fn get_cow_info(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::CowInfoObj {
         code: true,
         err_message: "".to_string(),
@@ -320,6 +348,16 @@ pub fn get_cow_info(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
         phone: "".to_string(),
         infos: "".to_string(),
         organization: "".to_string(),
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::UserIdObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();
@@ -351,7 +389,7 @@ pub fn get_cow_info(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
     HttpResponse::Ok().json(result_obj)
 }
 
-pub fn get_stu_info(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
+pub fn get_stu_info(req: HttpRequest) -> HttpResponse {
     let mut result_obj = json_objs::StuInfoObj {
         code: true,
         err_message: "".to_string(),
@@ -368,6 +406,16 @@ pub fn get_stu_info(data: web::Json<json_objs::UserIdObj>) -> HttpResponse {
         credit: 0,
         accepted: 0,
         finished: 0,
+    };
+
+    let query_str = req.query_string();
+    let data = match serde_urlencoded::from_bytes::<json_objs::UserIdObj>(query_str.as_bytes()) {
+        Ok(val) => val,
+        Err(_) => {
+            result_obj.code = false;
+            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+            return HttpResponse::BadRequest().json(result_obj);
+        }
     };
 
     let db_control = Controller::new();

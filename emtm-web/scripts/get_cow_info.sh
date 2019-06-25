@@ -1,21 +1,12 @@
 echo "Get Cow Info Test Case 1: (True)"
-curl http://localhost:6789/info/cow\
+curl http://localhost:6789/info/cow?userid=wechat12306\
  -H "Content-Type:application/json"\
- -X GET\
- -d '{"userid":"wechat12306"}'
+ -X GET
 echo ""
 
 echo "Get Cow Info Test Case 2: (False)"
-curl http://localhost:6789/info/cow\
+curl http://localhost:6789/info/cow?userid=wechat12307\
  -H "Content-Type:application/json"\
- -X GET\
- -d '{"userid":"wechat12307"}'
-echo ""
-
-echo "Get Cow Info Test Case 3: (False)"
-curl http://localhost:6789/info/cow\
- -H "Content-Type:application/json"\
- -X GET\
- -d '{"userid":"[]["}'
+ -X GET
 echo ""
 
