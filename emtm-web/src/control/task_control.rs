@@ -529,11 +529,11 @@ pub fn check_task(req: HttpRequest) -> HttpResponse {
         let database_person_id: UserId = UserId::Uid(person.student_uid);
         let participant_state = person.state;
 
-        let (person_id, person_name) = match db_control.get_user_from_identifier(database_person_id)
+        let (person_uid, person_id, person_name) = match db_control.get_user_from_identifier(database_person_id)
         {
-            Some(User::Student(stu)) => (stu.wechat_id, stu.username),
-            Some(User::Cow(_)) => ("".to_string(), "".to_string()),
-            None => ("".to_string(), "".to_string()),
+            Some(User::Student(stu)) => (stu.uid, stu.wechat_id, stu.username),
+            Some(User::Cow(_)) => (-1, "".to_string(), "".to_string()),
+            None => (-1, "".to_string(), "".to_string()),
         };
 
         // Handle Error
@@ -548,7 +548,7 @@ pub fn check_task(req: HttpRequest) -> HttpResponse {
             }
             accept_users.accept_user_num += 1;
             accept_users.accept_user_names.push(person_name.clone());
-            accept_users.accept_user_id.push(person_id.clone());
+            accept_users.accept_user_id.push(person_uid.clone());
         }
 
         /*
@@ -566,7 +566,7 @@ pub fn check_task(req: HttpRequest) -> HttpResponse {
             }
             finish_users.finish_user_num += 1;
             finish_users.finish_user_names.push(person_name.clone());
-            finish_users.finish_user_id.push(person_id.clone());
+            finish_users.finish_user_id.push(person_uid.clone());
         }
     }
 

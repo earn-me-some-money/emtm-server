@@ -352,7 +352,7 @@ pub struct GetTasksObj {
 pub struct TaskAccepterObj {
     pub accept_user_num: i32,
     pub accept_user_names: Vec<String>,
-    pub accept_user_id: Vec<String>,
+    pub accept_user_id: Vec<i32>,
 }
 
 // Mission Finisher description
@@ -360,7 +360,7 @@ pub struct TaskAccepterObj {
 pub struct TaskFinisherObj {
     pub finish_user_num: i32,
     pub finish_user_names: Vec<String>,
-    pub finish_user_id: Vec<String>,
+    pub finish_user_id: Vec<i32>,
 }
 
 // Mission Detailed description
