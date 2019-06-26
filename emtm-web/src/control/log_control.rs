@@ -8,7 +8,9 @@ use actix_web::{web, HttpResponse};
 
 use crate::control::json_objs;
 use crate::control::main_control;
-use emtm_db::controller::{user_controller::UserController, Controller};
+use emtm_db::controller::{
+    school_controller_zh::SchoolControllerZh, user_controller::UserController, Controller,
+};
 // Model Schemas
 use emtm_db::models::users::{Cow, Student, User, UserId};
 
@@ -156,6 +158,10 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
     // Pass checking, do db-stroing
     if logup_enable {
         // New Adding Cow Vector
+        let school_id = match db_control.get_school_id("中山大学") {
+            Some(_x) => _x,
+            None => 0,
+        };
         let students = vec![Student {
             uid: 0,
             wechat_id: data.userid.clone(),
@@ -165,7 +171,7 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
             username: data.username.clone(),
             verified: false,
             tokens: 0,
-            school_id: -1,
+            school_id: school_id,
             student_id: "".to_string(),
             credit: 100, // Init Credit Score is 100%
             accepted: 0,
