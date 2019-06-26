@@ -1119,6 +1119,17 @@ pub fn receive_task(data: web::Json<json_objs::CheckTaskObj>) -> HttpResponse {
 
         // Pass Checking, store participant into db
         if result_obj.code {
+            // Update current user's stae --> user.accept += 1
+            let wechat_id: UserId = UserId::WechatId(&data.userid);
+            match db_control.get_user_from_identifier(wechat_id) {
+                Some(User::Cow(_cow)) => {}
+                Some(User::Student(mut stu)) => {
+                    stu.accepted += 1;
+                    db_control.update_users(&vec![User::Student(stu)]);
+                }
+                None => {}
+            };
+
             let new_part_user = vec![Participant {
                 student_uid: database_real_user.uid,
                 state: PartState::from_val(0),
@@ -1226,10 +1237,11 @@ pub fn submit_task(data: web::Json<json_objs::SubmitTaskObj>) -> HttpResponse {
     };
 
     let db_control = Controller::new();
-
+    let mut bounty = 0;
     // Check target mission existence and whether current user is the poster
     match db_control.get_mission_from_mid(data.task_mid) {
         Some(task) => {
+            bounty = task.bounty;
             let current_wechat_id: UserId = UserId::WechatId(&data.userid);
             let current_uid = match db_control.get_user_from_identifier(current_wechat_id) {
                 Some(User::Cow(cow)) => cow.uid,
@@ -1265,6 +1277,7 @@ pub fn submit_task(data: web::Json<json_objs::SubmitTaskObj>) -> HttpResponse {
     let task_participant = db_control.get_mission_participants(data.task_mid);
 
     let mut is_part = false;
+    
     for person in task_participant.iter() {
         if person.student_uid == data.student_id {
             // Submit target student's mission state
@@ -1291,6 +1304,31 @@ pub fn submit_task(data: web::Json<json_objs::SubmitTaskObj>) -> HttpResponse {
         return HttpResponse::Ok().json(result_obj);
     }
 
+    // Update current user's state --> user.finished += 1
+    let wechat_id: UserId = UserId::Uid(data.student_id);
+    match db_control.get_user_from_identifier(wechat_id) {
+        Some(User::Cow(_)) => {}
+        Some(User::Student(mut stu)) => {
+            stu.finished += 1;
+            stu.tokens += bounty;
+            db_control.update_users(&vec![User::Student(stu)]);
+        }
+        None => {}
+    };
+
+    // Update poster's state --> money decrease
+    match db_control.get_user_from_identifier(UserId::WechatId(&data.userid)) {
+        Some(User::Cow(mut cow)) => {
+            cow.tokens -= bounty;
+            db_control.update_users(&vec![User::Cow(cow)]);
+        }
+        Some(User::Student(mut stu)) => {
+            stu.tokens -= bounty;
+            db_control.update_users(&vec![User::Student(stu)]);
+        }
+        None => {}
+    }
+
     HttpResponse::Ok().json(result_obj)
 }
 
@@ -1301,10 +1339,12 @@ pub fn submit_task_stu(data: web::Json<json_objs::SubmitQuestionNaireObj>) -> Ht
     };
 
     let db_control = Controller::new();
+    let mut bounty = 0;
 
     // Get target mission
     match db_control.get_mission_from_mid(data.task_mid) {
         Some(task) => {
+            bounty = task.bounty;
             if data.poster_id != task.poster_uid {
                 result_obj.code = false;
                 result_obj.err_message =
@@ -1418,6 +1458,28 @@ pub fn submit_task_stu(data: web::Json<json_objs::SubmitQuestionNaireObj>) -> Ht
             result_obj.code = false;
             result_obj.err_message = format!("{}", err);
         }
+    }
+
+    // Update current user's state --> user.finished += 1
+    let wechat_id: UserId = UserId::WechatId(&data.userid);
+    match db_control.get_user_from_identifier(wechat_id) {
+        Some(User::Cow(_)) => {}
+        Some(User::Student(mut stu)) => {
+            stu.finished += 1;
+            stu.tokens += bounty;
+            db_control.update_users(&vec![User::Student(stu)]);
+        }
+        None => {}
+    };
+
+    // Update poster's state --> money decrease
+    match db_control.get_user_from_identifier(UserId::Uid(data.poster_id)) {
+        Some(User::Cow(mut cow)) => {
+            cow.tokens -= bounty;
+            db_control.update_users(&vec![User::Cow(cow)]);
+        }
+        Some(User::Student(_)) => {}
+        None => {}
     }
 
     HttpResponse::Ok().json(result_obj)
