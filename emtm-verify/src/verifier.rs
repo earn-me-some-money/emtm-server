@@ -187,11 +187,7 @@ impl Verifier {
                     UnicodeSegmentation::graphemes(institute.as_str(), true).collect::<Vec<&str>>();
                 let institute_short = institute_graphemes[..institute_graphemes.len() - 2].join("");
                 for item in ocr_result.data.item_list {
-                    let item_graphemes =
-                        UnicodeSegmentation::graphemes(item.itemstring.as_str(), true)
-                            .collect::<Vec<&str>>();
-                    let item_short = item_graphemes[..item_graphemes.len() - 2].join("");
-                    if item_short == institute_short {
+                    if item.itemstring.contains(&institute_short) {
                         institute_match = true;
                     }
                     if sid.as_ref().is_some() && item.itemstring.contains(sid.as_ref().unwrap()) {
