@@ -291,7 +291,9 @@ pub fn verify(
 
                                 if school_id == -1 {
                                     result_obj.code = false;
-                                    result_obj.err_message = "School Name Error! Cannot search target school id...".to_string();
+                                    result_obj.err_message =
+                                        "School Name Error! Cannot search target school id..."
+                                            .to_string();
                                     return future::ok(HttpResponse::BadRequest().json(result_obj));
                                 }
 
@@ -303,7 +305,8 @@ pub fn verify(
                         },
                         None => {
                             result_obj.code = false;
-                            result_obj.err_message = "Error! Target user not in database!".to_string();
+                            result_obj.err_message =
+                                "Error! Target user not in database!".to_string();
                             return future::ok(HttpResponse::BadRequest().json(result_obj));
                         }
                     }
@@ -389,7 +392,8 @@ pub fn get_cow_info(req: HttpRequest) -> HttpResponse {
         email: "".to_string(),
         phone: "".to_string(),
         infos: "".to_string(),
-        organization: "".to_string(),
+        verified: false,
+        organization: None,
     };
 
     let query_str = req.query_string();
@@ -423,7 +427,10 @@ pub fn get_cow_info(req: HttpRequest) -> HttpResponse {
             result_obj.email = cow.email;
             result_obj.phone = cow.phone;
             result_obj.infos = cow.personal_info;
-            result_obj.organization = cow.company
+            if cow.verified {
+                result_obj.organization = Some(cow.company);
+            }
+            result_obj.verified = cow.verified;
         }
         User::Student(_) => {}
     };
@@ -440,8 +447,9 @@ pub fn get_stu_info(req: HttpRequest) -> HttpResponse {
         email: "".to_string(),
         phone: "".to_string(),
         infos: "".to_string(),
-        school_name: "".to_string(),
-        student_id: "".to_string(),
+        verified: false,
+        school_name: None,
+        student_id: None,
         major: "".to_string(),
         year: 0,
 
@@ -481,8 +489,11 @@ pub fn get_stu_info(req: HttpRequest) -> HttpResponse {
             result_obj.email = stu.email;
             result_obj.phone = stu.phone;
             result_obj.infos = stu.personal_info;
-            result_obj.school_name = db_control.get_school_name(stu.school_id).unwrap();
-            result_obj.student_id = stu.student_id;
+            result_obj.verified = stu.verified;
+            if result_obj.verified {
+                result_obj.school_name = Some(db_control.get_school_name(stu.school_id).unwrap());
+                result_obj.student_id = Some(stu.student_id);
+            }
             result_obj.major = stu.major;
             result_obj.year = stu.year;
 

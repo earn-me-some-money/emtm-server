@@ -8,9 +8,7 @@ use actix_web::{web, HttpResponse};
 
 use crate::control::json_objs;
 use crate::control::main_control;
-use emtm_db::controller::{
-    user_controller::UserController, Controller,
-};
+use emtm_db::controller::{user_controller::UserController, Controller};
 // Model Schemas
 use emtm_db::models::users::{Cow, Student, User, UserId};
 
@@ -19,7 +17,7 @@ pub fn logup_cow(
     userid: &str,
     phone: &str,
     email: &str,
-    infos: &str
+    infos: &str,
 ) -> HttpResponse {
     let mut result_obj = json_objs::OriginObj {
         code: true,
@@ -108,13 +106,7 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
     // Init DB Control
     let db_control = Controller::new();
     // Define Duplication error message
-    let dup_errors = [
-        "UserID",
-        "Email",
-        "Phone",
-        "Logup Error!",
-        "Duplication!",
-    ];
+    let dup_errors = ["UserID", "Email", "Phone", "Logup Error!", "Duplication!"];
     // Variable order: userid, email, organization
     let mut dup_array = [false, false, false, false];
     let mut logup_enable = true;

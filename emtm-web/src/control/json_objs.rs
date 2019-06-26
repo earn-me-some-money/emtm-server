@@ -13,7 +13,7 @@ pub struct CowLogupObj {
     pub wechat_ok: bool,
     pub email: String,
     pub phone: String,
-    pub infos: String
+    pub infos: String,
 }
 
 // Student-Logup Parse Json Struct
@@ -216,7 +216,7 @@ pub struct VerifyInfo {
     pub user_id: String,
     pub organization: String,
     // User self wechat id
-    pub wechat_id: String
+    pub wechat_id: String,
 }
 
 // Cow-User New Info Request
@@ -454,7 +454,8 @@ pub struct CowInfoObj {
     pub email: String,
     pub phone: String,
     pub infos: String,
-    pub organization: String,
+    pub verified: bool,
+    pub organization: Option<String>,
 }
 
 // Student-User Info return
@@ -467,8 +468,9 @@ pub struct StuInfoObj {
     pub email: String,
     pub phone: String,
     pub infos: String,
-    pub school_name: String,
-    pub student_id: String,
+    pub verified: bool,
+    pub school_name: Option<String>,
+    pub student_id: Option<String>,
     pub major: String,
     pub year: i32,
 
