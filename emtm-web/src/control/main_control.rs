@@ -287,10 +287,13 @@ pub fn get_wechatid(
     };
 
     let query_str = req.query_string();
-    let data = match serde_urlencoded::from_bytes::<json_objs::GetWechatIdObj>(query_str.as_bytes()) {
+    let data = match serde_urlencoded::from_bytes::<json_objs::GetWechatIdObj>(query_str.as_bytes())
+    {
         Ok(val) => val,
         Err(_) => {
-            return Box::new(futures::future::ok(HttpResponse::BadRequest().json(result_obj)));
+            return Box::new(futures::future::ok(
+                HttpResponse::BadRequest().json(result_obj),
+            ));
         }
     };
 

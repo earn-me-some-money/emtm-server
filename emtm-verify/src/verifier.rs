@@ -5,6 +5,8 @@ use md5::{Digest, Md5};
 use rand::random;
 use std::collections::BTreeMap;
 use std::env;
+use unicode_segmentation;
+use unicode_segmentation::UnicodeSegmentation;
 
 use actix_web::client::{Client, SendRequestError};
 use futures::Future;
@@ -181,11 +183,18 @@ impl Verifier {
 
                 let mut institute_match = false;
                 let mut id_match = sid.is_none();
+                let institute_graphemes =
+                    UnicodeSegmentation::graphemes(institute.as_str(), true).collect::<Vec<&str>>();
+                let institute_short = institute_graphemes[..institute_graphemes.len() - 2].join("");
                 for item in ocr_result.data.item_list {
-                    if item.itemstring == institute {
+                    let item_graphemes =
+                        UnicodeSegmentation::graphemes(item.itemstring.as_str(), true)
+                            .collect::<Vec<&str>>();
+                    let item_short = item_graphemes[..item_graphemes.len() - 2].join("");
+                    if item_short == institute_short {
                         institute_match = true;
                     }
-                    if sid.as_ref().is_some() && &item.itemstring == sid.as_ref().unwrap() {
+                    if sid.as_ref().is_some() && item.itemstring.contains(sid.as_ref().unwrap()) {
                         id_match = true;
                     }
                 }

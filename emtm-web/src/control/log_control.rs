@@ -191,7 +191,7 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
             personal_info: data.infos.clone(),
             email: data.email.clone(),
             username: data.username.clone(),
-            verified: true,
+            verified: false,
             tokens: 0,
             school_id: school_id.clone(),
             student_id: data.student_id.clone(),

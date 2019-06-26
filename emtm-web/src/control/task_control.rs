@@ -723,7 +723,8 @@ pub fn check_question_naire_answer(req: HttpRequest) -> HttpResponse {
     };
 
     let query_str = req.query_string();
-    let data = match serde_urlencoded::from_bytes::<json_objs::SubmitTaskObj>(query_str.as_bytes()) {
+    let data = match serde_urlencoded::from_bytes::<json_objs::SubmitTaskObj>(query_str.as_bytes())
+    {
         Ok(val) => val,
         Err(_) => {
             result_obj.code = false;
@@ -1146,14 +1147,15 @@ pub fn search_mission(req: HttpRequest) -> HttpResponse {
     };
 
     let query_str = req.query_string();
-    let data = match serde_urlencoded::from_bytes::<json_objs::MissionSearchObj>(query_str.as_bytes()) {
-        Ok(val) => val,
-        Err(_) => {
-            result_obj.code = false;
-            result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
-            return HttpResponse::BadRequest().json(result_obj);
-        }
-    };
+    let data =
+        match serde_urlencoded::from_bytes::<json_objs::MissionSearchObj>(query_str.as_bytes()) {
+            Ok(val) => val,
+            Err(_) => {
+                result_obj.code = false;
+                result_obj.err_message = "Error! Cannot Parse input parameters!".to_string();
+                return HttpResponse::BadRequest().json(result_obj);
+            }
+        };
 
     let db_control = Controller::new();
     // Search with database-searcher
