@@ -172,7 +172,7 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
             verified: false,
             tokens: 0,
             school_id: school_id,
-            student_id: "".to_string(),
+            student_id: data.userid.clone(),
             credit: 100, // Init Credit Score is 100%
             accepted: 0,
             finished: 0,
