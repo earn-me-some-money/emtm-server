@@ -10,9 +10,33 @@ RUN cargo install diesel_cli --no-default-features --features mysql
 
 WORKDIR /usr/src/emtm
 
-COPY . .
+# Cache optimization
+COPY ./Cargo.lock ./Cargo.toml ./
+COPY ./emtm-web/Cargo.toml ./emtm-web/Cargo.toml
+COPY ./emtm-verify/Cargo.toml ./emtm-verify/Cargo.toml
+COPY ./emtm-db/Cargo.toml ./emtm-db/Cargo.toml
+RUN mkdir emtm-db/src \
+    && echo "" > emtm-db/src/lib.rs \
+    && mkdir emtm-verify/src \
+    && echo "" > emtm-verify/src/lib.rs \
+    && mkdir emtm-web/src \
+    && echo "fn main() {}" > emtm-web/src/main.rs
+
+RUN cargo build --release \
+    && rm -rf emtm-db/src emtm-verify/src 
+
+COPY ./emtm-db ./emtm-db
+COPY ./emtm-verify ./emtm-verify
+RUN cargo build --release && rm -rf emtm-web/src
+
+COPY ./emtm-web ./emtm-web
+COPY ./scripts ./scripts
 
 RUN cargo build --release
 
-ENTRYPOINT ["./target/release/emtm-web"]
+RUN mkdir bin && mv ./target/release/emtm-web ./bin
+# smaller image
+RUN rm -rf target
+
+ENTRYPOINT ["./bin/emtm-web"]
 
