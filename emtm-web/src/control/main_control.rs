@@ -261,14 +261,53 @@ pub fn verify(
         false => None,
     };
 
+    let wechat_id = data.wechat_id.clone();
+
     Box::new(
         verifier
             .verify(&raw_data, &data.organization, Some(&data.organization))
-            .then(|verify_result| {
+            .then(move |verify_result| {
                 if let Err(err) = verify_result {
                     result_obj.err_message = format!("Verification failed: {:?}", err);
                     future::ok(HttpResponse::BadRequest().json(result_obj))
                 } else {
+                    // Make db target user's verify value true
+                    let db_control = Controller::new();
+
+                    match db_control.get_user_from_identifier(UserId::WechatId(&wechat_id)) {
+                        Some(user) => match user {
+                            User::Cow(mut cow) => {
+                                cow.verified = true;
+                                cow.company = data.organization.clone();
+                                db_control.update_users(&vec![User::Cow(cow)]);
+                            }
+                            User::Student(mut stu) => {
+                                stu.verified = true;
+                                // Search school id by school_name
+                                let school_id = match db_control.get_school_id(&data.organization) {
+                                    Some(_x) => _x,
+                                    None => -1,
+                                };
+
+                                if school_id == -1 {
+                                    result_obj.code = false;
+                                    result_obj.err_message = "School Name Error! Cannot search target school id...".to_string();
+                                    return future::ok(HttpResponse::BadRequest().json(result_obj));
+                                }
+
+                                stu.school_id = school_id;
+                                stu.student_id = data.user_id.clone();
+
+                                db_control.update_users(&vec![User::Student(stu)]);
+                            }
+                        },
+                        None => {
+                            result_obj.code = false;
+                            result_obj.err_message = "Error! Target user not in database!".to_string();
+                            return future::ok(HttpResponse::BadRequest().json(result_obj));
+                        }
+                    }
+
                     result_obj.code = true;
                     future::ok(HttpResponse::Ok().json(result_obj))
                 }

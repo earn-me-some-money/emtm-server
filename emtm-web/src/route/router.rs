@@ -31,8 +31,7 @@ pub fn cow_logup(data: web::Json<json_objs::CowLogupObj>) -> HttpResponse {
         &data.userid,
         &data.phone,
         &data.email,
-        &data.infos,
-        &data.organization,
+        &data.infos
     )
 }
 

@@ -9,7 +9,7 @@ use actix_web::{web, HttpResponse};
 use crate::control::json_objs;
 use crate::control::main_control;
 use emtm_db::controller::{
-    school_controller_zh::SchoolControllerZh, user_controller::UserController, Controller,
+    user_controller::UserController, Controller,
 };
 // Model Schemas
 use emtm_db::models::users::{Cow, Student, User, UserId};
@@ -19,8 +19,7 @@ pub fn logup_cow(
     userid: &str,
     phone: &str,
     email: &str,
-    infos: &str,
-    organization: &str,
+    infos: &str
 ) -> HttpResponse {
     let mut result_obj = json_objs::OriginObj {
         code: true,
@@ -85,9 +84,9 @@ pub fn logup_cow(
             personal_info: infos.to_string(),
             email: email.to_string(),
             username: username.to_string(),
-            verified: true,
+            verified: false,
             tokens: 0,
-            company: organization.to_string(),
+            company: "".to_string(),
         }];
 
         if let Err(err) = db_control.add_cows(&cows).remove(0) {
@@ -113,7 +112,6 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
         "UserID",
         "Email",
         "Phone",
-        "School_Info",
         "Logup Error!",
         "Duplication!",
     ];
@@ -153,28 +151,10 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
         None => (),
     }
 
-    // Search school id by school_name
-    let school_id = match db_control.get_school_id(&data.school_name) {
-        Some(_x) => _x,
-        None => -1,
-    };
-
-    if school_id == -1 {
-        result_obj.code = false;
-        result_obj.err_message = "School Name Error! Cannot search target school id...".to_string();
-        return HttpResponse::Ok().json(result_obj);
-    }
-
-    let check_user_school_info: UserId = UserId::SchoolInfo(school_id, &data.student_id);
-    match db_control.get_user_from_identifier(check_user_school_info) {
-        Some(_x) => dup_array[3] = true,
-        None => (),
-    }
-
-    for index in 0..4 {
+    for index in 0..3 {
         if dup_array[index] {
             logup_enable = false;
-            result_obj.err_message = [dup_errors[4], dup_errors[index], dup_errors[5]]
+            result_obj.err_message = [dup_errors[3], dup_errors[index], dup_errors[4]]
                 .join(" ")
                 .to_string();
             break;
@@ -193,8 +173,8 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
             username: data.username.clone(),
             verified: false,
             tokens: 0,
-            school_id: school_id.clone(),
-            student_id: data.student_id.clone(),
+            school_id: -1,
+            student_id: "".to_string(),
             credit: 100, // Init Credit Score is 100%
             accepted: 0,
             finished: 0,
