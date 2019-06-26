@@ -37,12 +37,23 @@ pub fn release_task(data: web::Json<json_objs::ReleaseTaskObj>) -> HttpResponse 
 
     // Init DB Control
     let db_control = Controller::new();
+    let mut error_index = 6;
 
     // Get current user's database-user-id
     let wechat_user_id: UserId = UserId::WechatId(&data.userid);
     let database_user_id = match db_control.get_user_from_identifier(wechat_user_id) {
-        Some(User::Cow(cow)) => cow.uid,
-        Some(User::Student(stu)) => stu.uid,
+        Some(User::Cow(cow)) => {
+            if cow.tokens <= 0 {
+                error_index = 5;
+            }
+            cow.uid
+        }
+        Some(User::Student(stu)) => {
+            if stu.tokens <= 0 {
+                error_index = 5;
+            }
+            stu.uid
+        }
         None => -1,
     };
 
@@ -60,9 +71,9 @@ pub fn release_task(data: web::Json<json_objs::ReleaseTaskObj>) -> HttpResponse 
         "Task Pay Can not be Negative",
         "Task Time-Limit Invalid",
         "Task Max-Participants Number Should be Positive",
+        "Current User Balance Not Positive",
     ];
 
-    let mut error_index = 5;
     let exist_posted_tasks = db_control.get_poster_missions(database_user_id);
     // Check task name duplication
     for task in exist_posted_tasks.iter() {
@@ -93,7 +104,7 @@ pub fn release_task(data: web::Json<json_objs::ReleaseTaskObj>) -> HttpResponse 
         _ => (),
     };
 
-    if error_index < 5 {
+    if error_index < 6 {
         result_obj.code = false;
         result_obj.err_message = ["Error!", error_types[error_index]].join(" ").to_string();
         return HttpResponse::Ok().json(result_obj);
@@ -529,12 +540,12 @@ pub fn check_task(req: HttpRequest) -> HttpResponse {
         let database_person_id: UserId = UserId::Uid(person.student_uid);
         let participant_state = person.state;
 
-        let (person_uid, person_id, person_name) = match db_control.get_user_from_identifier(database_person_id)
-        {
-            Some(User::Student(stu)) => (stu.uid, stu.wechat_id, stu.username),
-            Some(User::Cow(_)) => (-1, "".to_string(), "".to_string()),
-            None => (-1, "".to_string(), "".to_string()),
-        };
+        let (person_uid, person_id, person_name) =
+            match db_control.get_user_from_identifier(database_person_id) {
+                Some(User::Student(stu)) => (stu.uid, stu.wechat_id, stu.username),
+                Some(User::Cow(_)) => (-1, "".to_string(), "".to_string()),
+                None => (-1, "".to_string(), "".to_string()),
+            };
 
         // Handle Error
         if person_id == "".to_string() {
@@ -1277,7 +1288,7 @@ pub fn submit_task(data: web::Json<json_objs::SubmitTaskObj>) -> HttpResponse {
     let task_participant = db_control.get_mission_participants(data.task_mid);
 
     let mut is_part = false;
-    
+
     for person in task_participant.iter() {
         if person.student_uid == data.student_id {
             // Submit target student's mission state
@@ -1560,7 +1571,10 @@ pub fn get_tasks_top(req: HttpRequest) -> HttpResponse {
     };
 
     let db_control = Controller::new();
-    let latest_mid = db_control.get_missions_list().len() as i32;
+    let latest_mid = match db_control.get_missions_list().last() {
+        Some(mission) => mission.mid,
+        None => 0,
+    };
 
     let (start, end) = (latest_mid - data.number + 1, latest_mid + 1);
 

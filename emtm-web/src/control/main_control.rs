@@ -228,9 +228,8 @@ pub fn get_balance(req: HttpRequest) -> HttpResponse {
     };
 
     if user_balance < 0 {
-        result_obj.code = false;
-        result_obj.err_message = "Error! Cannot find target user in database!".to_string();
-        return HttpResponse::Ok().json(result_obj);
+        result_obj.err_message =
+            "Your current balance is negative, please deposit some~".to_string();
     }
 
     result_obj.balance = user_balance;
