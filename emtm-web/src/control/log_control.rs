@@ -162,6 +162,11 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
             Some(_x) => _x,
             None => 0,
         };
+
+        let rand_student_id : String = (0..15)
+            .map(|_| (0x20u8 + (rand::random::<f32>() * 96.0) as u8) as char)
+            .collect();
+
         let students = vec![Student {
             uid: 0,
             wechat_id: data.userid.clone(),
@@ -172,7 +177,7 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
             verified: false,
             tokens: 0,
             school_id: school_id,
-            student_id: data.userid.clone(),
+            student_id: rand_student_id,
             credit: 100, // Init Credit Score is 100%
             accepted: 0,
             finished: 0,

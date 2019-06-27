@@ -21,9 +21,11 @@ serde_urlencoded = "*"
 serde_derive = "1.0"
 json = "*"
 
+rand = "0.6.5"
+
 regex = "*"
 
 chrono = "0.4.6"
 
-emtm_db = { path = "../emtm-db" }
-emtm-verify = { path = "../emtm-verify" }
+emtm_db = { git = "https://github.com/earn-me-some-money/emtm-db.git" }
+emtm-verify = { git = "https://github.com/earn-me-some-money/emtm-verify.git" }
