@@ -163,7 +163,7 @@ pub fn logup_student(data: web::Json<json_objs::StuLogupObj>) -> HttpResponse {
             None => 0,
         };
 
-        let rand_student_id : String = (0..15)
+        let rand_student_id: String = (0..15)
             .map(|_| (0x20u8 + (rand::random::<f32>() * 96.0) as u8) as char)
             .collect();
 

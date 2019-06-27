@@ -255,8 +255,8 @@ pub fn verify(
 
     let verifier = Verifier::new();
 
-    let _id = match data.verify_mode {
-        true => Some(&data.user_id),
+    let id = match data.verify_mode {
+        true => Some(data.user_id.as_str()),
         false => None,
     };
 
@@ -264,7 +264,7 @@ pub fn verify(
 
     Box::new(
         verifier
-            .verify(&raw_data, &data.organization, Some(&data.organization))
+            .verify(&raw_data, &data.organization, id)
             .then(move |verify_result| {
                 if let Err(err) = verify_result {
                     result_obj.err_message = format!("Verification failed: {:?}", err);
@@ -278,7 +278,14 @@ pub fn verify(
                             User::Cow(mut cow) => {
                                 cow.verified = true;
                                 cow.company = data.organization.clone();
-                                db_control.update_users(&vec![User::Cow(cow)]);
+                                match db_control.update_users(&vec![User::Cow(cow)]).remove(0) {
+                                    Ok(_) => (),
+                                    Err(err) => {
+                                        result_obj.code = false;
+                                        result_obj.err_message = format!("{:?}", err);
+                                        return future::ok(HttpResponse::BadRequest().json(result_obj));
+                                    }
+                                }
                             }
                             User::Student(mut stu) => {
                                 stu.verified = true;
@@ -299,7 +306,14 @@ pub fn verify(
                                 stu.school_id = school_id;
                                 stu.student_id = data.user_id.clone();
 
-                                db_control.update_users(&vec![User::Student(stu)]);
+                                match db_control.update_users(&vec![User::Student(stu)]).remove(0) {
+                                    Ok(_) => (),
+                                    Err(err) => {
+                                        result_obj.code = false;
+                                        result_obj.err_message = format!("{:?}", err);
+                                        return future::ok(HttpResponse::BadRequest().json(result_obj));
+                                    }
+                                }
                             }
                         },
                         None => {
